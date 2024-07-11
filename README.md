@@ -1,19 +1,23 @@
 # Hall-Effect-Sensor-CAD-Mouse-Spacemouse
 A 6 degrees of freedom mouse for CAD programs using cheap linear hall effect sensors for position measurement
 
-This started as a thought project based on the Teaching Tech $20 CAD mouse code. This code works with the 3D ConneXions device driver so any program that works with the 3D connecxions mouse will work with his $20 CAD mouse and also this one.
+This started as a thought project based on the Teaching Tech $20 CAD mouse code. This code works with the 3D ConneXions device driver so any program that works with the 3D connecxions Spacemouse will work with his $20 CAD mouse and also this one. Luckily the thought project turned into a real one as I did my research.
+
 The linear hall effect sensors used are the (SS) 49e variety. They are very cheap, I bought a pack of 40 for £10. 8 are required for this project. They are arranged in 4 groups of 2. 2 of the groups are parallel to the x-axis and 2 parallel to the y-axis.
 These sensors have 3 pins. VCC, GND and output. With power connected, the output should give a value of half way between VCC abd GND. i.e. if 5v is connected then with no magnent field detected the output should be 2.5v. If the north pole of a magnet approches the sensor the output should decrease upto to a minimum voltage of 0.86v while if a south pole approches then the voltage at the output should increase up to a maximum of 4.21v.
-Using this, the operation of the mouse can be described in a couple of pictures.
+Using these sensors, the operation of the mouse can be described in a couple of pictures.
 
-![HSE default position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/22768b33-1452-4082-bedd-532636bab065)
+![HSE default position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/2f481cac-fb42-43b2-aadf-97f9857cf204)
+
 The red dots represent magnets suspended a short distance above each hall effect sensor pair. In their resting position (shown above) the sensors values are measured. 
-![HSE forward position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/e42b34f1-42dd-414b-b4ef-b3ecb01f2316)
 
-If the joystick is pushed forward, the magnets move closer towards two of the hall effect sensors on opposite pairs, increasing the magnetic field that they detect and further away from the other two which will detect less.
-Because we can present only one pole of the magnet, we are restricted to only half of the possible output range. Luckily the Arduino Pro Micro we are using to measure the outputs, has the ability of switching to an internal ADC reference of 2.56 volts. Therefore if we present north poles to the sensors we should expect each sensor to output between 0.86 and 2.5 volts. so we don't lose too much resolution.
+![HSE forward position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/c7de75c6-740d-4b25-bcd4-53b219882980)
+
+If the joystick is pushed forward slightly, the magnets move closer towards two of the hall effect sensors on opposite pairs, increasing the magnetic field that they detect and further away from the other two which will detect less.
+Because we can present only one pole of the magnet, we are restricted to only half of the possible output range. I chose to have the north pole being the one closest to the sensors as the analog to digital converter was returning a value over half its possible range so I was getting the greatest range of values this was. Although I didn't know it at the time, the Arduino Pro Micro we are using to measure the outputs, also has the ability of switching to an internal ADC reference of 2.56 volts. Therefore if we present north poles to the sensors we should expect each sensor to output between 0.86 and 2.5 volts. so we don't lose much resolution.
 So for the picture above, the sensors with the magnets moving towards them will show a decreasing voltage, while the two where the magnets are moving away from them will output an increasing voltage.
-![HSE twist position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/fbe4f562-9d27-4331-9b0a-0155fb85486c)
+
+![HSE twist position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/fc66283e-45a0-4e7f-927e-ad3782e62984)
 
 If we twist the joystick then diagonally opposite sensors will show a decreasing voltage as the magnet approches while their pair will show an increasing voltage as the magnet moves away.
 
@@ -21,15 +25,15 @@ When the joystick is tilted towards a pair of sensors then both their outputs sh
 Of course this will be the same for the other pair parallel to the other axis.
 
 <h2>That is the operation now here is the implementation.</h2>
-![2HE Spacemouse small ](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/5f6114a7-bd73-48bb-8b9a-cf5aaafbc14b)
 
-![DSC05620](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/4f5cfa1a-4475-4a92-9e19-b41e6ca1fe40)
+![2HE Spacemouse ](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/fb9bd010-946c-430c-8a02-33de694884fc)
 
 
-The mouse is made up of several layers or plates. The bottom plate holds the arduino pro micro. This needs to be wired to the sensors and optional switches. The wiring diagram is shown below.
-![HE Spacemouse Wiring Diagram](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/ee5f8d90-065a-41cc-b25e-70e7bf3e9211)
+![DSC05622](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/0f08f281-a2f4-42f3-9003-8baec25efb77)
 
-I am using servo sockets to hold the hall effect sensors, however the default wiring colours for servo connectors doesn't match what is needed for the sensors. The middle pin on a servo is 5v and the connector wll normally have a red wire to this, however it is ground on the sensor. Withe the angled side face up and the legs towards you, The left most pin is VCC, the middle pin ground and the right most pin the output. I swapped the VCC and GND wires on the servo sockets to avoid confusion.
+The mouse is made up of several layers or plates. The bottom plate holds the arduino pro micro. This needs to be wired to the sensors and optional switches. The wiring diagram is in it's own folder.
+
+I am using servo sockets to hold the hall effect sensors, however the default wiring colours for servo connectors doesn't match what is needed for the sensors. The middle pin on a servo is 5v and the connector wll normally have a red wire to this, however it is ground on the sensor. With the angled side face up and the legs towards you, The left most pin is VCC, the middle pin ground and the right most pin the output. I swapped the VCC and GND wires on the servo sockets to avoid confusion.
 
 ![DSC05604](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/a20550b7-fcf4-4fb4-9411-fe3bc642fd1a)
 
