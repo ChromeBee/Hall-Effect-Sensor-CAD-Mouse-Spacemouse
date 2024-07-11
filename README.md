@@ -33,16 +33,17 @@ When we push down on the joystick, the magnets get closer to all the sensors so 
 <h2>That is the operation now here is the implementation.</h2>
 <h3> Parts list</h3>
 <ul>
-<li>Arduino Pro Micro</li>
-<li>8 of (SS) 49e linear hall effect sensors</li>
-<li>4 of 10x5x3mm Neodymium magnets
-<li>8 of servo sockets and leads</li>
-<li>1mm diameter piano wire cut into 8 lengths of 8mm each and 4 lengths of 155mm</li>
-<li>8 of 0.2x12x4mm tension springs ( wire diameter 0.2mm, total length 12mm, length of spring portion 4mm and OD of 4mm </li>
-<li>10 of M3x4mm heat press brass inserts</li>
-<li>2 of M3x8mm to hold on knob</li>
-<li>4 of M3x6mm bolts to hold on base</li>
-<li>4 of M3x6mm or M3x8mm bolts to hold on case</li>
+  <li>Arduino Pro Micro</li>
+  <li>8 of (SS) 49e linear hall effect sensors</li>
+  <li>4 of 10x5x3mm Neodymium magnets
+  <li>8 of servo sockets and leads</li>
+  <li>3 of 6x6x5mm small tactile switches</li>
+  <li>1mm diameter piano wire cut into 8 lengths of 8mm each and 4 lengths of 155mm</li>
+  <li>8 of 0.2x12x4mm tension springs ( wire diameter 0.2mm, total length 12mm, length of spring portion 4mm and OD of 4mm </li>
+  <li>10 of M3x4mm heat press brass inserts</li>
+  <li>2 of M3x8mm to hold on knob</li>
+  <li>4 of M3x6mm bolts to hold on base</li>
+  <li>4 of M3x6mm or M3x8mm bolts to hold on case</li>
 </ul>
 
 
