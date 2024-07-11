@@ -25,6 +25,8 @@ So for the picture above, the sensors with the magnets moving towards them will 
 
 If we twist the joystick then diagonally opposite sensors will show a decreasing voltage as the magnet approches while the other sensor in the pair will show an increasing voltage as the magnet moves away.
 
+![magnet movement](https://github.com/user-attachments/assets/506b0533-7976-4b15-a061-2134a3f90dbd)
+
 When the joystick is tilted towards a pair of sensors then both their outputs show a decreasing voltage while the magnets on the opposite side will be moving away from the pair below it and so the sensors will output an increasing voltage.
 Of course, the other pair parallel to the other axis will operate in the same way for tilts, twists and linear movements in the other axis.
 
