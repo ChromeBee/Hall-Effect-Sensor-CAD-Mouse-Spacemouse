@@ -32,6 +32,10 @@ Of course, the other pair parallel to the other axis will operate in the same wa
 
 When we push down on the joystick, the magnets get closer to all the sensors so the voltage output drops in them all and when we pull up on the joystick, the magnets move further away from all the sensors, so the outputs will increase.
 
+![DSC05601 v2](https://github.com/user-attachments/assets/b89e7a96-9139-462e-9681-07e234784e64)
+
+I tried various designs before I came up with the one that I'm going to take you through below. Including ones with multiple magnets per sensor pair but that is irrelavent if you just want to build what I came up with.
+
 <h2>That is the operation now here is the implementation.</h2>
 <h3> Parts list</h3>
 <ul>
