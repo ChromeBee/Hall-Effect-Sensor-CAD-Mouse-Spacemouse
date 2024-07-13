@@ -15,13 +15,13 @@ Using these sensors, the operation of the mouse can be described in a couple of 
 
 The red dots represent magnets suspended a short distance above each hall effect sensor pair. In their resting position (shown above) the sensors values are measured. Any change from these measured values represents a move of the joystick.
 
-![HSE forward position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/c7de75c6-740d-4b25-bcd4-53b219882980)![HSE forward position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/6c0e58ed-847f-40bf-b49f-63c33f8e34c7)
+![HSE forward position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/c7de75c6-740d-4b25-bcd4-53b219882980) ![HSE forward position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/6c0e58ed-847f-40bf-b49f-63c33f8e34c7)
 
 If the joystick is pushed forward slightly, the magnets move closer towards two of the hall effect sensors on opposite pairs, increasing the magnetic field that they detect and further away from the other two which will detect less.
 Because we can present only one pole of the magnet, we are restricted to only half of the possible output range. I chose to have the north pole being the one closest to the sensors as the analog to digital converter was returning a value over half its possible range so I was getting the greatest range of values this way. Although I didn't know it at the time, the Arduino Pro Micro we are using to measure the outputs, also has the ability of switching to an internal ADC reference of 2.56 volts. Therefore if we present north poles to the sensors we should expect each sensor to output between 0.86 and 2.5 volts. so we don't lose much resolution.
 So for the picture above, the sensors with the magnets moving towards them will output a decreasing voltage, while the two where the magnets are moving away from them will output an increasing voltage.
 
-![HSE twist position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/fc66283e-45a0-4e7f-927e-ad3782e62984)![HSE twist position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/9a88eaa0-60dc-4c95-aabd-1f4a4bd0da99)
+![HSE twist position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/fc66283e-45a0-4e7f-927e-ad3782e62984) ![HSE twist position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/9a88eaa0-60dc-4c95-aabd-1f4a4bd0da99)
 
 If we twist the joystick then diagonally opposite sensors will show a decreasing voltage as the magnet approches while the other sensor in the pair will show an increasing voltage as the magnet moves away.
 
@@ -50,6 +50,7 @@ I tried various designs before I came up with the one that I'm going to take you
   <li>2 of M3x8mm to hold on knob</li>
   <li>4 of M3x6mm bolts to hold on base</li>
   <li>4 of M3x6mm or M3x8mm bolts to hold on case</li>
+  <li>Heat Shrink tubing or Insulation tape or liquid insulation to cover wire to wire solder joints</li>
 </ul>
 
 
@@ -118,3 +119,16 @@ The CAD Mouse/Spacemouse is now complete.
 This is the same process as the teaching Tech model and is covered on their Open Source spacemouse model's printables page at https://www.printables.com/model/864950-open-source-spacemouse-space-mushroom-remix
 
 The process is also covered in the comments in the arduino sketch. It involves setting up a custom arduino board that the 3D connexion software recognises as a Spacemouse Pro Wireless.
+
+This is what I've been able to discover that the button report can contain. The Spacemouse pro wireless supports 18 programmable buttons although the code indicates more. There are 4 bytes in the report and depending on what bit is set to 1 it causes the following to happen.
+<TABLE BORDER="1">
+<TR><B><TD>Bit Number</TD><TD>Byte 0</TD><TD>Byte 1</TD><TD>Byte 2</TD><TD>Byte 3</TD></B></TR>
+<TR><B><TD>bit 0</TD></B><TD>Configuration Screen</TD><TD>Rotate 90 degrees</TD><TD>-----</TD><TD>Shift key</TD></TR>
+<TR><B><TD>bit 1</TD></B><TD>Fit to screen</TD><TD>-----</TD><TD>-----</TD><TD>CTRL key</TD></TR>
+<TR><B><TD>bit 2</TD></B><TD>Plan View</TD><TD>-----</TD><TD>-----</TD><TD>TAB key/Disable rotate</TD></TR>
+<TR><B><TD>bit 3</TD></B><TD>-----</TD><TD>-----</TD><TD>-----</TD><TD>-----</TD></TR>
+<TR><B><TD>bit 4</TD></B><TD>Right view</TD><TD>Hide design Browser</TD><TD>-----</TD><TD>-----</TD></TR>
+<TR><B><TD>bit 5</TD></B><TD>Front view</TD><TD>Open File Explorer</TD><TD>-----</TD><TD>-----</TD></TR>
+<TR><B><TD>bit 6</TD></B><TD>-----</TD><TD>Internet</TD><TD>ESC key</TD><TD>-----</TD></TR>
+<TR><B><TD>bit 7</TD></B><TD>-----</TD><TD>Copy key</TD><TD>ALT key</TD><TD>-----</TD></TR>
+</TABLE>
