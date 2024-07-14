@@ -11,19 +11,26 @@ The linear Hall Effect sensors used are the (SS) 49e variety. They are very chea
 These sensors have 3 pins. VCC, GND and output. With power connected, the output should give a value of half way between VCC and GND. i.e. if 5v is connected then with no magnet field detected the output should be 2.5v. If the north pole of a magnet approaches the sensor the output should decrease up to to a minimum voltage of 0.86v while if a south pole approaches then the voltage at the output should increase up to a maximum of 4.21v.
 Using these sensors, the operation of the mouse can be described in a couple of pictures.
 
-![HSE default position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/2f481cac-fb42-43b2-aadf-97f9857cf204)
+![HSE default position](https://github.com/user-attachments/assets/1f4cd16f-ca06-49b7-ac2b-b3b004b99ea6)
 
 The red dots represent magnets suspended a short distance above each Hall Effect sensor pair. In their resting position (shown above) the sensors values are measured. Any change from these measured values represents a move of the joystick.
 
-![HSE forward position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/c7de75c6-740d-4b25-bcd4-53b219882980) ![HSE forward position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/6c0e58ed-847f-40bf-b49f-63c33f8e34c7)
+![HSE forward position v2](https://github.com/user-attachments/assets/830d69a4-e3ec-4239-aa2f-18654d20d580) ![HSE forward position](https://github.com/user-attachments/assets/8e460d1b-338a-4dab-aa7d-9ab180917c38)
 
-If the joystick is pushed forward slightly, the magnets move closer towards two of the Hall Effect sensors on opposite pairs, increasing the magnetic field that they detect and further away from the other two which will detect less.
+If the joystick is pushed forward slightly, the magnets move closer towards two of the Hall Effect sensors on opposite pairs (A & C in the picture), increasing the magnetic field that they detect and further away from the other two (B & D) which will detect less.
 Because we can present only one pole of the magnet, we are restricted to only half of the possible output range. I chose to have the north pole being the one closest to the sensors as the analogue to digital converter was returning a value over half its possible range so I was getting the greatest range of values this way. Although I didn't know it at the time, the Arduino Pro Micro we are using to measure the outputs, also has the ability of switching to an internal ADC reference of 2.56 volts. Therefore if we present north poles to the sensors we should expect each sensor to output between 0.86 and 2.5 volts. So we don't lose much resolution.
-So for the picture above, the sensors with the magnets moving towards them will output a decreasing voltage, while the two where the magnets are moving away from them will output an increasing voltage.
+So for the picture above, the sensors with the magnets moving towards them will output a decreasing voltage, while the two where the magnets are moving away from them will output an increasing voltage. If we take the values for the sensors at their resting positions and subtract the current values then The resulting value will go up as the magnet approaches and down when the magnet moves away. We will call this the sensor value from now on.
 
-![HSE twist position v2](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/fc66283e-45a0-4e7f-927e-ad3782e62984) ![HSE twist position](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/9a88eaa0-60dc-4c95-aabd-1f4a4bd0da99)
+Now by adding the resulting values for sensors A & C and subtracting the values for B & D we get a result proportional to the amount of movement. If the value is positive in our example above we know it is a movement towards Sensors A & C and if it is negative then it is a movement away from them.
 
-If we twist the joystick then diagonally opposite sensors will show a decreasing voltage as the magnet approaches while the other sensor in the pair will show an increasing voltage as the magnet moves away.
+![HSE twist position v2](https://github.com/user-attachments/assets/283c17a6-c5ca-4265-b88b-3254fcbe5a69) ![HSE twist position](https://github.com/user-attachments/assets/f9283c45-3b4b-476e-ad99-67ee85f07616)
+
+
+If we twist the joystick then diagonally opposite sensors will show a decreasing voltage as the magnet approaches while the other sensor in the pair will show an increasing voltage as the magnet moves away. 
+
+By adding the values from sensors A & D and subtract the values from B & C we get a result that is proportional to the amount of twist. In our example a positive movement number will be a twist in the clockwise direction and negative will mean an anti-clockwise twist direction.
+
+If we apply these values to the linear movement formula, we find that the the increased value for A is cancelled out by the increased value for D and B cancels out C. So we can tell the difference between a twist and a push. The same logic applies to the other movements.
 
 ![magnet movement](https://github.com/user-attachments/assets/242753d5-30d4-4fa5-ac5f-48ff3149bf8d)
 
