@@ -17,7 +17,7 @@
 // When compiling and uploading, He select Arduino AVR boards (in Sketchbook) > Spacemouse and then the serial port.
 // You will also need to download and install the 3DConnexion software: https://3dconnexion.com/us/drivers-application/3dxware-10/
 // If all goes well, the 3DConnexion software will show a SpaceMouse Pro wireless when the Arduino is connected.
-// *JC - John Crombie - I'd like to add a big thank yoy to Teaching Tech for this code. If it wasn't for this I wouldn't
+// *JC - John Crombie - I'd like to add a big thank you to Teaching Tech for this code. If it wasn't for this I wouldn't
 // have been tempted to try to implement a Hall Effect sensor version. All my changes will be marked with a *JC comment
 // All debug Serial.print statements have had the joystick output text has been renamed as HESx e.g. AX is now HSE0
 
@@ -27,7 +27,7 @@
 
 // Debugging
 // 0: Debugging off. Set to this once everything is working.
-// 1: *JC Output raw Hall Effect Sensor values. 176 - 1024 raw ADC 10-bit values. 5V ADC reference
+// 1: *JC Output raw Hall Effect Sensor values. 176 - 862 raw ADC 10-bit values. 5V ADC reference
 // 2: *JC Output centered Hall Effect Sensor values. Values should be approx -424 to +424, jitter around 0 at idle. ADC reference 2.56v
 // 3: *JC Output centered Hall Effect Sensor values. Filtered for deadzone. Approx -424+DEADZONE to +424-DEADZONE, locked to zero at idle. Also button values. ADC reference 2.56v
 // 4: Output translation and rotation values. Approx -500 to +500 depending on the parameter. *JC ADC reference 2.56v
@@ -39,7 +39,7 @@ int debug = 0;
 // Switch between true/false as desired.
 bool invX = false; // pan left/right
 bool invY = false; // pan up/down
-bool invZ = false; // zoom in/out
+bool invZ = true; // zoom in/out
 bool invRX = false; // Rotate around X axis (tilt front/back)
 bool invRY = false; // Rotate around Y axis (tilt left/right)
 bool invRZ = false; // Rotate around Z axis (twist left/right)
@@ -78,7 +78,7 @@ int BTNLIST[3] = { // Button pin list
 // Deadzone to filter out unintended movements. 
 // Increase if the mouse has small movements when it should be idle or the mouse is too senstive to subtle movements.
 // Note that the 3d Connections also has its own deadzone processes
-int DEADZONE = 35;
+int DEADZONE = 40;
 
 
 // This portion sets up the communication with the 3DConnexion software. The communication protocol is created here.
@@ -180,7 +180,9 @@ void setup() {
     pinMode(BTNLIST[i],INPUT_PULLUP);
   }
   //*JC - reduce ADC reference voltage from 5V to 2.56 if not using debug = 1
-  if (debug != 1) {
+  if (debug == 1) {
+    analogReference(DEFAULT);
+  } else {
     analogReference(INTERNAL);
   }
 
@@ -199,17 +201,19 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   uint8_t rot[6] = { rx & 0xFF, rx >> 8, ry & 0xFF, ry >> 8, rz & 0xFF, rz >> 8 };
   HID().SendReport(2, rot, 6);
   // *JC - Button Report
-  // these are the button functions for first byte in Fusion 360
-  //  bit 0 - bring up configuration dialog - logical button (press BTN0 and BTN2 at the same time)
+  // these are the button functions for first byte in Fusion 360. For other functions see the GitHub repositry
+  //  bit 0 - bring up configuration dialog - logical button (press BTN0 and BTN2 at the same time) rotaee 45 degrees
   //  bit 1 - fit to screen
   //  bit 2 - plan view
   //  bit 3 - no function?
-  //  bit 4 - right view
-  //  bit 5 - front view
+  //  bit 4 - right view hide
+  //  bit 5 - front view File
   //  bit 6 - no function?
   //  bit 7 - no function?
   uint8_t btn[4] ={32*buttonValues[3]+16*buttonValues[2]+4*buttonValues[1]+buttonValues[0],0,0,0};
-  HID().SendReport(3,btn,4);
+  if (buttonValues[0]||buttonValues[1]||buttonValues[2]||buttonValues[3]) { // *JC - only send report if a button is pressed
+    HID().SendReport(3,btn,4);
+  }
 }
 
 void loop() {
