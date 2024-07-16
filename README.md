@@ -44,6 +44,10 @@ When we push down on the joystick, the magnets get closer to all the sensors so 
 I tried various designs before I came up with the one that I'm going to take you through below. Including ones with multiple magnets per sensor pair but that is irrelevant if you just want to build what I came up with.
 
 <h2>That is the operation now here is the implementation.</h2>
+
+This build is also available on Printables. There may be more build details there but there will always be more technical details here on GitHub.
+https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-sensors
+
 <h3> Parts list</h3>
 <ul>
   <li>Arduino Pro Micro</li>
