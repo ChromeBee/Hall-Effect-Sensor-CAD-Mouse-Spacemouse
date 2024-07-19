@@ -91,7 +91,7 @@ A second set of nuts is added to the 20mm bolts holding on the bolt plate, then 
 
 ![DSC05614](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/09749bd8-3714-411c-8503-8e7d2a5fded3)
 
-Loading the software on to the Arduino pro micro and setting debug level to 1, we can ensure, by bringing a magnet close to each sensor, that the sensor works, is correctly connected and which pole of the magnet is being presented to it. Once we have identified the north pole of the magnet we can glue 4 10x5x3mm magnets into the magnet holder.
+Loading the software on to the Arduino pro micro and setting debug level to 1, we can ensure, by bringing a magnet close to each sensor, that the sensor works, is correctly connected and which pole of the magnet is being presented to it. Once we have identified the north pole of the magnet we can glue 4 10x5x3mm magnets into the magnet holder. The north pole should face downward, that is towards the side of the magnet plate with a slot in the area were the magnets go.
 
 ![DSC05616](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/5cc63cbd-342c-4449-ac5e-858ab9c8cb56)
 
@@ -131,6 +131,8 @@ This is the same process as the teaching Tech model and is covered on their Open
 
 The process is also covered in the comments in the Arduino sketch. It involves setting up a custom Arduino board that the 3D connexion software recognises as a Spacemouse Pro Wireless.
 
+The 3D connexions driver is fairly flexible on the range of values the mouse sends to it for it to work. To have the most flexible range, both in positiva and negative directions, with debug set to 1, and analogRference(DEFAULT) I.e. 5 volts, the outputs should be reading around the value of 342. If the analogReference(INTERNAL) is set then, the mid range value should be around 684. You can adjust the distance of the sensor plate from the magnet plate to adjust this. Each corner can be adjusted independently.
+
 This is what I've been able to discover that the button report can contain. The Spacemouse pro wireless supports 18 programmable buttons although the code indicates more. There are 4 bytes in the report and depending on what bit is set to 1 it causes the following to happen.
 <TABLE BORDER="1">
 <TR><B><TD>Bit Number</TD><TD>Byte 0</TD><TD>Byte 1</TD><TD>Byte 2</TD><TD>Byte 3</TD></B></TR>
@@ -143,3 +145,14 @@ This is what I've been able to discover that the button report can contain. The 
 <TR><B><TD>bit 6</TD></B><TD>-----</TD><TD>Internet</TD><TD>ESC key</TD><TD>-----</TD></TR>
 <TR><B><TD>bit 7</TD></B><TD>-----</TD><TD>Copy key</TD><TD>ALT key</TD><TD>-----</TD></TR>
 </TABLE>
+
+Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
+
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
+[cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
