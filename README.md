@@ -57,6 +57,8 @@ https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-s
   <li>3 of 6x6x5mm small tactile switches</li>
   <li>1mm diameter piano wire cut into 8 lengths of 8mm each and 4 lengths of 155mm</li>
   <li>8 of 0.2x12x4mm tension springs ( wire diameter 0.2mm, total length 12mm, length of spring portion 4mm and OD of 4mm </li>
+  <li>1 of M4x40mm bolt fully threaded.</li>
+  <li>3 of M4 Nut</li>
   <li>10 of M3x4mm heat press brass inserts</li>
   <li>2 of M3x8mm to hold on knob</li>
   <li>4 of M3x6mm bolts to hold on base</li>
@@ -68,6 +70,7 @@ https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-s
 ![DSC05621](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/a798ff2c-2c87-416c-a540-b41bc3f5fb03)
 
 The mouse is made up of several layers or plates. The bottom plate holds the Arduino pro micro. This needs to be wired to the sensors and optional switches. The wiring diagram is in it's own folder in this project directory.
+![coloured render of HE Spacemouse with labels](https://github.com/user-attachments/assets/4b6e3db6-7545-4a1f-980b-1fec078da638)
 
 I am using servo sockets to hold the Hall Effect sensors, however the default wiring colours for servo connectors doesn't match what is needed for the sensors. The middle pin on a servo is 5v and the connector will normally have a red wire to this, however it is ground on the sensor. With the angled side face up and the legs towards you, the left most pin is VCC, the middle pin ground and the right most pin the output. I swapped the VCC and GND wires on the servo sockets to avoid confusion.
 
