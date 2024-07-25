@@ -20,8 +20,15 @@
 // *JC - John Crombie - I'd like to add a big thank you to Teaching Tech for this code. If it wasn't for this I wouldn't
 // have been tempted to try to implement a Hall Effect sensor version. All my changes will be marked with a *JC comment
 // All debug Serial.print statements have had the joystick output text has been renamed as HESx e.g. AX is now HSE0
-
-
+/**********************************************
+ * change log
+ * C001 - 18-Jul-24 - Reversed default direction of Z rotation
+ * C002 - 22-Jul-24 - Added state machine code to handle pressing two buttons at once to cause a third action and supress
+ *                    suppress the default action of the two buttons pressed. Before I didn't supress the actions
+ * C003 - 25-Jul-24 - Added define for movement3DC to switch between default 3DConnexion axis movement and Teaching Techs default movement
+ * 
+ ************************************************/
+ 
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
 #include "HID.h"
 
@@ -32,14 +39,23 @@
 // 3: *JC Output centered Hall Effect Sensor values. Filtered for deadzone. Approx -424+DEADZONE to +424-DEADZONE, locked to zero at idle. Also button values. ADC reference 2.56v
 // 4: Output translation and rotation values. Approx -500 to +500 depending on the parameter. *JC ADC reference 2.56v
 // 5: Output debug 3 and 4 side by side for direct cause and effect reference. *JC ADC reference 2.56v
+// 6: *JC Output debug info for pseudo key state machine. ( two keys pressed at once to simulate another key press)
 int debug = 0;
+
+// Choose between 3DConnexion default movement or Teaching Tech's
+// With 3DConnexion you push the joystick away from you to zoom out and towards you to zoom in.
+// lifting up the joystick moves up and pushing down moves down.
+// With the Teaching Tech default, these two axis are swapped so that pulling up or pushing down the knob controls zoom
+// and pushing away or pulling it towards you controls up and down. I prefer this.
+// set to true for 3DConnection movement.
+bool movement3DC  = false;
 
 // Direction
 // Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software.
 // Switch between true/false as desired.
 bool invX = false; // pan left/right
-bool invY = false; // pan up/down
-bool invZ = true; // zoom in/out
+bool invY = false; // Zoom in/out or pan up/down // C003 *JC - 3DC default movement or TT default
+bool invZ = true; // pan up/down or zoom in/out // C003 *JC - 3DC default movement or TT default
 bool invRX = false; // Rotate around X axis (tilt front/back)
 bool invRY = false; // Rotate around Y axis (tilt left/right)
 bool invRZ = false; // Rotate around Z axis (twist left/right)
@@ -153,11 +169,77 @@ void readAllFromSensors(int *rawReads){
 }
 
 // *JC Function to read and store button values
+// When pressing two buttons at once for a different function, one button is usually pressed slightly before the other.
+// To prevent the first buttons function being triggered, we wait 10ms to see if another button is pressed in the meantime.
+// if so we send the pseudo button value. if not we send the first button value.
+// keyState 0 - no button pressed
+// keyState 1 - 1 or 3 pressed
+// keystate 2 - 1&3 pressed within timelimit
+// keystate 3 = 1&3 not pressed within timelimit
+// keyState 4 = Wait until physical buttons released to reset state.
+unsigned long keyTimeNew, keyTimeOld = 0;
+uint8_t keyState=0, oldButtonValues[4] = {0,0,0,0}; 
 void readAllFromButtons(uint8_t *buttonValues){
   for(int i=1; i<4; i++){ // read real button values
     buttonValues[i] = !digitalRead(BTNLIST[i-1]);
   }
+
+  // C002 - *JC changed logic for handling pseudo/logical switch (two buttons pressed at once gives different function)
+  buttonValues[0] = false;
+  keyTimeNew = millis();
+  switch(keyState) {
+    case 0: // no button pressed so far
+     if (buttonValues[1] || buttonValues[3]) {
+       if (debug == 6) Serial.println("1");
+       keyState = 1;
+       keyTimeOld = keyTimeNew;
+       buttonValues[1] = buttonValues[3] = false;
+     }
+     break;
+
+     case 1: // button 1 or 3 pressed - what has happed with the elapsed time
+     if (debug == 6) Serial.println("keyState 1 - one button pressed");
+     if (keyTimeNew - keyTimeOld > 15) {
+       keyState = 3; // second button not pressed
+     } else if (buttonValues[1] && buttonValues[3]) {
+       keyState = 2; // second button pressed
+     }
+     buttonValues[1] = buttonValues[3] = false;
+     break;
+
+     case 2: // second button pressed - set logical button
+     if (debug == 6) Serial.println("keyState 2 - second button pressed - set logical button");
+     buttonValues[0] = true;
+     keyState = 4;
+     buttonValues[1] = buttonValues[3] = false;
+     break;
+
+     case 3: // second button not pressed, send the original button
+     if (debug == 6) Serial.println("keyState 3 - second button not presswed in time");
+     keyState = 4;
+     break;
+
+     case 4: //wait until buttons released to reset state
+     if (debug == 6) Serial.println("keyState 4 - wait for buttons to be released before resetting state");
+     if (!buttonValues[1] && !buttonValues[3]) {
+       keyState = 0;
+     }
+     buttonValues[0] = buttonValues[1] = buttonValues[3] = false;
+
+     break;
+}
+      
+ 
+// *JC - only send button value once 
+  for (int i=0;i<4;i++) {
+    if (buttonValues[i] == oldButtonValues[i]) {
+      buttonValues[i]=0; // send only once
+    } else {
+      oldButtonValues[i] = buttonValues[i];   
+    }
+   }
   //  based on real values set logical switch
+  /*  Old code to handle logical button - doesn't supress first button pressed action
   if( buttonValues[1] && buttonValues[3]) {
     buttonValues[0] = true;
     buttonValues[1] = buttonValues[3] = false;
@@ -166,6 +248,7 @@ void readAllFromButtons(uint8_t *buttonValues){
   {
     buttonValues[0] = false;
   }
+  */
 }
 
 void setup() {
@@ -293,7 +376,7 @@ void loop() {
   transZ = (centered[HES1]+centered[HES0]+centered[HES3]+centered[HES2]+centered[HES7]+centered[HES6]+centered[HES9]+centered[HES8])/4;
   rotX = (centered[HES0]+centered[HES1]-centered[HES6]-centered[HES7])/2;
   rotY = (centered[HES8]+centered[HES9]-centered[HES2]-centered[HES3])/2;
-  rotZ = (centered[HES1]+centered[HES3]+centered[HES7]+centered[HES9]-centered[HES0]-centered[HES2]-centered[HES6]-centered[HES8])/4;
+  rotZ = (centered[HES0]+centered[HES2]+centered[HES6]+centered[HES8]-centered[HES1]-centered[HES3]-centered[HES7]-centered[HES9])/4; // C001 *JC - changed default direction of rotation
 // *JC - modified speed calculation to allow for the fact that this is integer calculations
 // so do multiplications prior to divisions to maintain maximum accuracy.
   transX = (transX*speed)/100;
@@ -338,7 +421,13 @@ void loop() {
   }
 
 // Send data to the 3DConnexion software.
-// The correct order for me was determined after trial and error by Teaching Tech
+// The correct order for me was determined after trial and error - Teaching Tech
 // *JC - Added buttons for button report
-  send_command(rotX, rotY, rotZ, transX, transZ, transY,buttonReads);
+// *JC C003 Allowing swap between TT movement and 3DC movement defaults.
+  if (movement3DC) {
+    send_command(rotX, rotY, rotZ, transX, transY, transZ,buttonReads); // 3DC default
+  }
+  else {
+    send_command(rotX, rotY, rotZ, transX, transZ, transY,buttonReads); // TT default
+  }
 }
