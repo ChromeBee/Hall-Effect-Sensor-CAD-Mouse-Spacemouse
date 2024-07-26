@@ -55,7 +55,7 @@ https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-s
   <li>4 of 10x5x3mm Neodymium magnets
   <li>8 of servo sockets and leads</li>
   <li>3 of 6x6x5mm small tactile switches</li>
-  <li>1mm diameter piano wire cut into 8 lengths of 8mm each and 4 lengths of 155mm</li>
+  <li>1mm diameter piano wire cut into 8 lengths of 8mm each and 4 lengths of 15mm</li>
   <li>8 of 0.2x12x4mm tension springs ( wire diameter 0.2mm, total length 12mm, length of spring portion 4mm and OD of 4mm </li>
   <li>1 of M4x40mm bolt fully threaded.</li>
   <li>3 of M4 Nut</li>
