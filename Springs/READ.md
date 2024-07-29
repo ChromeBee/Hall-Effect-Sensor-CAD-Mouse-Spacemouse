@@ -12,4 +12,6 @@ The 0.3x10x3mm springs seem to require a similar amount of force to the 0.4x12x4
 The 0.2x12x4mm springs are very light to move in comparison to the other two.
 
 The strings are stretched to about 20mm in the home position so a longer spring should work and being under less tension, it should be easier to move.
-However it needs to be short enough to pull the magnet plate back to the home position when the mouse knob is released.
+However it needs to be short enough to pull the magnet plate back to the home position when the mouse knob is released. Remember that the tension can be adjusted somewhat by moving the wire holder further up or down the M4 bolt.
+
+A search of eBay.co.uk for 0.2mm tension springs does provide listings of some suppliers of 0.2x10x3mm and 0.2x15x3mm springs. I haven't tried them but both sizes should work (in theory).
