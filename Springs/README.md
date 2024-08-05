@@ -39,3 +39,5 @@ This "spring" has a square cross section of 2mm across. Although it works, the t
 This works much better. Certain movements are of equivalent tension to the 0.3mm springs while other movements are easier. It certainly feels usable.
 
 I'm going to stick with my 0.2mm springs but I've put the STL files for the 1mm crossection TPU spring and the matching holder in a subdirectory here should anybody wish to try it.
+
+<b>Update:</b> For some reason, I can't leave this alone. I modified the design of the TPU spring and created STL files for a 0.8mm and a 0.6mm version. I have put these in the spring STL directory. I was going to leave it at that but then I decided to print them. I've tried both in one of the test prints. The 0.6mm one feels quite like the 0.2mm springs I'm using and the 0.8mm one just adds a bit more tension. I don't know if these will last long term but they are cheap to make and worth a try if you have difficulty getting the springs.
