@@ -59,6 +59,8 @@ https://www.printables.com/model/940040-cad-mouse-spacemouse-using-hall-effect-s
   <li>8 of 0.2x12x4mm tension springs ( wire diameter 0.2mm, total length 12mm, length of spring portion 4mm and OD of 4mm </li>
   <li>1 of M4x40mm bolt fully threaded.</li>
   <li>3 of M4 Nut</li>
+  <li>4 of M3x20 bolts to secure the bolt plate and hold the sensor plate the correct distance from the magnet plate.</li>
+  <li>12 of M3 nuts for the above bolts.</li>
   <li>10 of M3x4mm heat press brass inserts</li>
   <li>2 of M3x8mm to hold on knob</li>
   <li>4 of M3x6mm bolts to hold on base</li>
