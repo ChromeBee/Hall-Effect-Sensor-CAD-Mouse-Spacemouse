@@ -26,7 +26,8 @@
  * C002 - 22-Jul-24 - Added state machine code to handle pressing two buttons at once to cause a third action and supress
  *                    suppress the default action of the two buttons pressed. Before I didn't supress the actions
  * C003 - 25-Jul-24 - Added define for movement3DC to switch between default 3DConnexion axis movement and Teaching Techs default movement
- * 
+ * C004 - 04-Aug-24 - bug fix - Changed key reporting so that a zero report is sent when the final key is released.
+ *                    Changed the place where duplicate keys reports are supressed. Used to be in the key rutine now in the report routine
  ************************************************/
  
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
@@ -170,7 +171,7 @@ void readAllFromSensors(int *rawReads){
 
 // *JC Function to read and store button values
 // When pressing two buttons at once for a different function, one button is usually pressed slightly before the other.
-// To prevent the first buttons function being triggered, we wait 10ms to see if another button is pressed in the meantime.
+// To prevent the first buttons function being triggered, we wait 15ms to see if another button is pressed in the meantime.
 // if so we send the pseudo button value. if not we send the first button value.
 // keyState 0 - no button pressed
 // keyState 1 - 1 or 3 pressed
@@ -178,7 +179,8 @@ void readAllFromSensors(int *rawReads){
 // keystate 3 = 1&3 not pressed within timelimit
 // keyState 4 = Wait until physical buttons released to reset state.
 unsigned long keyTimeNew, keyTimeOld = 0;
-uint8_t keyState=0, oldButtonValues[4] = {0,0,0,0}; 
+uint8_t keyState = 0, keyPressed = 0, oldButtonValues[4] = {0,0,0,0}; // C004 - *JC - keyPrsded added to keep track of last key pressed (in state machine).
+
 void readAllFromButtons(uint8_t *buttonValues){
   for(int i=1; i<4; i++){ // read real button values
     buttonValues[i] = !digitalRead(BTNLIST[i-1]);
@@ -197,7 +199,7 @@ void readAllFromButtons(uint8_t *buttonValues){
      }
      break;
 
-     case 1: // button 1 or 3 pressed - what has happed with the elapsed time
+     case 1: // button 1 or 3 pressed - what has happened with the elapsed time
      if (debug == 6) Serial.println("keyState 1 - one button pressed");
      if (keyTimeNew - keyTimeOld > 15) {
        keyState = 3; // second button not pressed
@@ -211,33 +213,45 @@ void readAllFromButtons(uint8_t *buttonValues){
      if (debug == 6) Serial.println("keyState 2 - second button pressed - set logical button");
      buttonValues[0] = true;
      keyState = 4;
+     keyPressed = 0; // C004 - *JC - record button 0 pressed
      buttonValues[1] = buttonValues[3] = false;
      break;
 
      case 3: // second button not pressed, send the original button
-     if (debug == 6) Serial.println("keyState 3 - second button not presswed in time");
+     if (debug == 6) Serial.println("keyState 3 - second button not pressed in time");
      keyState = 4;
+     if (buttonValues[1]) { // C004 - *JC - record which button was pressed and will be reported
+      keyPressed = 1;
+     } else {
+      keyPressed = 3;
+     }
      break;
 
      case 4: //wait until buttons released to reset state
      if (debug == 6) Serial.println("keyState 4 - wait for buttons to be released before resetting state");
+
      if (!buttonValues[1] && !buttonValues[3]) {
-       keyState = 0;
+       keyState = 0;   
      }
-     buttonValues[0] = buttonValues[1] = buttonValues[3] = false;
+     buttonValues[keyPressed] = true; // C004 - *JC - keep the keys pressed.
 
      break;
 }
+
       
- 
+/* C004 - *JC - move supression of sending multiple key reports to report sending routine. 
 // *JC - only send button value once 
   for (int i=0;i<4;i++) {
     if (buttonValues[i] == oldButtonValues[i]) {
       buttonValues[i]=0; // send only once
     } else {
+      if (debug == 6) {
+        Serial.print("Button "); Serial.print(i); Serial.print(" changed - Old Value ");Serial.print(oldButtonValues[i]); Serial.print(" New Value ");Serial.println(buttonValues[i]);
+      }
       oldButtonValues[i] = buttonValues[i];   
     }
    }
+*/
   //  based on real values set logical switch
   /*  Old code to handle logical button - doesn't supress first button pressed action
   if( buttonValues[1] && buttonValues[3]) {
@@ -275,6 +289,7 @@ void setup() {
   readAllFromSensors(centerPoints);
 }
 
+uint8_t keyChange = 0; // C004 - *JC - variable to determine if new key report needs to be sent.
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol outlined earlier. Two sets of data are sent: translation and then rotation.
 // For each, a 16bit integer is split into two using bit shifting. The first is mangitude and the second is direction.
 // *JC - Added button report
@@ -294,8 +309,9 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   //  bit 6 - no function?
   //  bit 7 - no function?
   uint8_t btn[4] ={32*buttonValues[3]+16*buttonValues[2]+4*buttonValues[1]+buttonValues[0],0,0,0};
-  if (buttonValues[0]||buttonValues[1]||buttonValues[2]||buttonValues[3]) { // *JC - only send report if a button is pressed
+  if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]!=keyChange) { // C004 - *JC - changed operation *JC - only send report if a button is pressed
     HID().SendReport(3,btn,4);
+    keyChange = buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]; // C004 - *JC - record keys pressed for next time through the loop
   }
 }
 
@@ -321,7 +337,8 @@ void loop() {
   // Subtract centre position from measured position to determine movement.
   // *JC - As we are going negative with the readings, we make them positive
   // by subtraction them from the recorded centerPoints rather than the other was around.
-  for(int i=0; i<8; i++) centered[i] = centerPoints[i] - rawReads[i]; // 
+  // C0004 - changed back to the original TT version to match the code from AndunHH 
+  for(int i=0; i<8; i++) centered[i] = centerPoints[i]-rawReads[i]; // 
   // Report centered Sensor values if enabled. Values should be approx -256 to +256, jitter around 0 at idle.
   if(debug == 2){
     Serial.print("HES0:"); Serial.print(centered[0]); Serial.print(",");
@@ -373,10 +390,10 @@ void loop() {
   // *JC - Replaced Joystick calculations with ones for the Hall Effect Sensors
   transX = (centered[HES1]-centered[HES0]+centered[HES6]-centered[HES7])/2;  
   transY = (centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8])/2;  
-  transZ = (centered[HES1]+centered[HES0]+centered[HES3]+centered[HES2]+centered[HES7]+centered[HES6]+centered[HES9]+centered[HES8])/4;
+  transZ = (centered[HES0]+centered[HES1]+centered[HES2]+centered[HES3]+centered[HES6]+centered[HES7]+centered[HES8]+centered[HES9])/4;
   rotX = (centered[HES0]+centered[HES1]-centered[HES6]-centered[HES7])/2;
   rotY = (centered[HES8]+centered[HES9]-centered[HES2]-centered[HES3])/2;
-  rotZ = (centered[HES0]+centered[HES2]+centered[HES6]+centered[HES8]-centered[HES1]-centered[HES3]-centered[HES7]-centered[HES9])/4; // C001 *JC - changed default direction of rotation
+  rotZ = (centered[HES0]+centered[HES2]+centered[HES6]+centered[HES8]-centered[HES1]-centered[HES3]-centered[HES7]-centered[HES9])/4; // C0001 *JC - changed default direction of rotation
 // *JC - modified speed calculation to allow for the fact that this is integer calculations
 // so do multiplications prior to divisions to maintain maximum accuracy.
   transX = (transX*speed)/100;
