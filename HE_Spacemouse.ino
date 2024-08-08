@@ -28,6 +28,7 @@
  * C003 - 25-Jul-24 - Added define for movement3DC to switch between default 3DConnexion axis movement and Teaching Techs default movement
  * C004 - 04-Aug-24 - bug fix - Changed key reporting so that a zero report is sent when the final key is released.
  *                    Changed the place where duplicate keys reports are supressed. Used to be in the key rutine now in the report routine
+ * C006 - 08-Aug-24 - bug fix - After logical button was pressed, all buttons were being sent in state 4. Now corrected.                   
  ************************************************/
  
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
@@ -175,11 +176,11 @@ void readAllFromSensors(int *rawReads){
 // if so we send the pseudo button value. if not we send the first button value.
 // keyState 0 - no button pressed
 // keyState 1 - 1 or 3 pressed
-// keystate 2 - 1&3 pressed within timelimit
-// keystate 3 = 1&3 not pressed within timelimit
+// keystate 2 - 1&3 pressed within time limit
+// keystate 3 = 1&3 not pressed within time limit
 // keyState 4 = Wait until physical buttons released to reset state.
 unsigned long keyTimeNew, keyTimeOld = 0;
-uint8_t keyState = 0, keyPressed = 0, oldButtonValues[4] = {0,0,0,0}; // C004 - *JC - keyPrsded added to keep track of last key pressed (in state machine).
+uint8_t keyState = 0, keyPressed = 0, oldButtonValues[4] = {0,0,0,0}; // C004 - *JC - keyPresed added to keep track of last key pressed (in state machine).
 
 void readAllFromButtons(uint8_t *buttonValues){
   for(int i=1; i<4; i++){ // read real button values
@@ -192,10 +193,10 @@ void readAllFromButtons(uint8_t *buttonValues){
   switch(keyState) {
     case 0: // no button pressed so far
      if (buttonValues[1] || buttonValues[3]) {
-       if (debug == 6) Serial.println("1");
+       if (debug == 6) Serial.println("keyState 0 - button pressed move to keyState 1");
        keyState = 1;
        keyTimeOld = keyTimeNew;
-       buttonValues[1] = buttonValues[3] = false;
+       buttonValues[1] = buttonValues[3] = false; // don't send button values yet.
      }
      break;
 
@@ -206,7 +207,7 @@ void readAllFromButtons(uint8_t *buttonValues){
      } else if (buttonValues[1] && buttonValues[3]) {
        keyState = 2; // second button pressed
      }
-     buttonValues[1] = buttonValues[3] = false;
+     buttonValues[1] = buttonValues[3] = false; // don't send button values yet
      break;
 
      case 2: // second button pressed - set logical button
@@ -233,6 +234,7 @@ void readAllFromButtons(uint8_t *buttonValues){
      if (!buttonValues[1] && !buttonValues[3]) {
        keyState = 0;   
      }
+     buttonValues[0] = buttonValues[1] = buttonValues[3] = false; //C005 - *JC - bug fix. Was here before but was removed for the last release
      buttonValues[keyPressed] = true; // C004 - *JC - keep the keys pressed.
 
      break;
@@ -312,6 +314,8 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]!=keyChange) { // C004 - *JC - changed operation *JC - only send report if a button is pressed
     HID().SendReport(3,btn,4);
     keyChange = buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]; // C004 - *JC - record keys pressed for next time through the loop
+    if (debug == 6) {Serial.print("keyChange = "); Serial.println(keyChange);} // C005 - *JC - to help debug key press issues
+
   }
 }
 
