@@ -21,6 +21,11 @@ Another way to reduce the tension is to install a second wire holder on the bolt
 Another example with the plate moved further up the M4 bolt.
 ![DSC05650 small](https://github.com/user-attachments/assets/ae8c9640-dc88-4dad-a2c9-780758ed08b7)
 
+I thought of another way of reducing the tension when using 0.3x10x3mm springs. Fewer springs.
+![DSC05654 small](https://github.com/user-attachments/assets/c5f64f1b-a733-479d-b98f-a3aed2728153)
+
+I removed alternate springs from the upper and lower sections. This seems to work very well. It still centres and moves in all directions but easier.
+
 A search of eBay.co.uk for 0.2mm tension springs does provide listings of some suppliers of 0.2x10x3mm and 0.2x15x3mm springs. I haven't tried them but both sizes should work (in theory).
 
 -------------
