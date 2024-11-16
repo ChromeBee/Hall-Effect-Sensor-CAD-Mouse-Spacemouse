@@ -45,4 +45,41 @@ This works much better. Certain movements are of equivalent tension to the 0.3mm
 
 I'm going to stick with my 0.2mm springs but I've put the STL files for the 1mm crossection TPU spring and the matching holder in a subdirectory here should anybody wish to try it.
 
-<b>Update:</b> For some reason, I can't leave this alone. I modified the design of the TPU spring and created STL files for a 0.8mm and a 0.6mm version. I have put these in the spring STL directory. I was going to leave it at that but then I decided to print them. I've tried both in one of the test prints. The 0.6mm one feels quite like the 0.2mm springs I'm using and the 0.8mm one just adds a bit more tension. I don't know if these will last long term but they are cheap to make and worth a try if you have difficulty getting the springs.
+<b>18-Aug-2024 Update:</b> For some reason, I can't leave this alone. I modified the design of the TPU spring and created STL files for a 0.8mm and a 0.6mm version. I have put these in the spring STL directory. I was going to leave it at that but then I decided to print them. I've tried both in one of the test prints. The 0.6mm one feels quite like the 0.2mm springs I'm using and the 0.8mm one just adds a bit more tension. I don't know if these will last long term but they are cheap to make and worth a try if you have difficulty getting the springs.
+
+<b>16-Nov-2024 Update:</b> I think I've cracked it and now have the perfect TPU "spring" version. It might even be better than the normal spring version.
+![Mechanisim and case](https://github.com/user-attachments/assets/08ad6060-fd84-4ed6-ae66-6b23b99dffa4)
+
+This uses two TPU "springs" that are slightly longer and with thinner mounting hooks so that two of these "springs" can be used at the same time. One of the issues with the TPU springs was that a pendulum like rotatary oscillation could occur. It was simple to eliminate by twisting the two TPU hooks located above and below the magnet plate in opposite directions. This twist in the springs would stop the oscillation but also put a rotational strain on the M4 nuts which could cause them to loosen over time. This design counteracts that but applies the same principle.
+
+<b>Additional parts needed:</b>
+<li>2 prints of either of the "Thin TPU spring 0.6x16mm.stl" or "Thin TPU spring 0.6x17mm.stl" obviously printed in TPU.</li>
+<li>1 print of TPU Bolt Plate printed in PLA. This is just a shorter version of the orininal bolt plate without spring mounting slots. The original can still be used.</li>
+<li>2 prints of the TPU hook.</li>
+<li>1 print of the magnet plate 0.3 from the original model. This is the magnet plate for 0.3mm springs.</li>
+<br>
+The two "springs" are mounted so that one twists the mechanisim on one direction while the second twists it in the other cancelling out the rotational strain.
+I hope seeing this in pictures helps to explain what I mean.
+
+![Parts for TPU assembly](https://github.com/user-attachments/assets/d452f351-b8ae-4aac-8be4-302a6b2049e3)
+
+
+One spring is mounted as normal to the TPU hook plate.
+![Added to lower bolt plate](https://github.com/user-attachments/assets/d6c378ad-6c8b-4033-816d-b11c239d6f0b)
+
+The second one is also added to the same hook plate. I have mounted the first one with the end hooks on the bottom TPU Hook mount and the second with the centre on the mount. That is just how I did it and it doesnt really matter how it is done. I then mounted this to the bolt plate using an M4 40mm bolt and an M4 nut.
+![Magnet plate added](https://github.com/user-attachments/assets/e6a8fbba-f543-4e39-bb58-59a7c58bc0b2)
+
+To add clarity, I have added the second TPU hook plate and magnet plate at this point but it should be mounted to the arduino plate and passed through the sensor plate before these are added. The magnet plate is connected as normal to one of the TPU springs.
+![Second set conneted to magnet plate](https://github.com/user-attachments/assets/a18e6fb2-1cf8-4c05-8385-6eedf9a3d5b4)
+
+The second spring is now connected to the magnet plate but its mounts are connected to an ajacent slot to the previous spring. In my case I rotated the magnet plate slightly counter clockwise and located the spring in the next slot.
+![completed mechanisim](https://github.com/user-attachments/assets/c0a5f9f5-816a-4156-b3b1-1f58324910fd)
+
+I then did the same again with the end of this spring when mounting it to the top TPU hook, rotating it counter clockwise so the end fits in the next slot along from the one that is vertically above the slot on the magnet plate I have just fitted the middle part of the spring.
+![completed mechanisim](https://github.com/user-attachments/assets/2145aaec-fbc4-4394-bfa4-a96c123b238d)
+
+The printed washer and final M4 nut go on top. The nuts should be tighted in such a way that each magnet is centered over a sensor pair.
+![Assembled device front and high](https://github.com/user-attachments/assets/0cb13960-e1b4-4d88-bf74-fa717aa7ebc7)
+
+I have taken the idea from the build by Rares Paul on Printables and soldered the Vcc leads of each of the sensor pairs together and conected the Vcc of each pair together with a wire then repeated the same for the ground leads. While Rares Paul used hot melt glue to insulate the soldered leads, I used liquid insulation because I had some. The result, i think, looks quite neat.
