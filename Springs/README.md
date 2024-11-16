@@ -65,21 +65,26 @@ I hope seeing this in pictures helps to explain what I mean.
 
 
 One spring is mounted as normal to the TPU hook plate.
+
 ![Added to lower bolt plate](https://github.com/user-attachments/assets/d6c378ad-6c8b-4033-816d-b11c239d6f0b)
 
-The second one is also added to the same hook plate. I have mounted the first one with the end hooks on the bottom TPU Hook mount and the second with the centre on the mount. That is just how I did it and it doesnt really matter how it is done. I then mounted this to the bolt plate using an M4 40mm bolt and an M4 nut.
+The second one is also added to the same hook plate. I have mounted the first one with the end hooks on the bottom TPU Hook mount and the second with the centre on the mount. That is just how I did it and it doesnt really matter how it is done. I then mounted this to the bolt plate using an M4 40mm bolt and an M4 nut. <b>Note the spring is mounted so the ends are in the middle of the area that sits below the sensors.</b>
+
 ![Magnet plate added](https://github.com/user-attachments/assets/e6a8fbba-f543-4e39-bb58-59a7c58bc0b2)
 
 To add clarity, I have added the second TPU hook plate and magnet plate at this point but it should be mounted to the arduino plate and passed through the sensor plate before these are added. The magnet plate is connected as normal to one of the TPU springs.
 ![Second set conneted to magnet plate](https://github.com/user-attachments/assets/a18e6fb2-1cf8-4c05-8385-6eedf9a3d5b4)
 
 The second spring is now connected to the magnet plate but its mounts are connected to an ajacent slot to the previous spring. In my case I rotated the magnet plate slightly counter clockwise and located the spring in the next slot.
+
 ![completed mechanisim](https://github.com/user-attachments/assets/c0a5f9f5-816a-4156-b3b1-1f58324910fd)
 
 I then did the same again with the end of this spring when mounting it to the top TPU hook, rotating it counter clockwise so the end fits in the next slot along from the one that is vertically above the slot on the magnet plate I have just fitted the middle part of the spring.
+
 ![completed mechanisim](https://github.com/user-attachments/assets/2145aaec-fbc4-4394-bfa4-a96c123b238d)
 
 The printed washer and final M4 nut go on top. The nuts should be tighted in such a way that each magnet is centered over a sensor pair.
+
 ![Assembled device front and high](https://github.com/user-attachments/assets/0cb13960-e1b4-4d88-bf74-fa717aa7ebc7)
 
-I have taken the idea from the build by Rares Paul on Printables and soldered the Vcc leads of each of the sensor pairs together and conected the Vcc of each pair together with a wire then repeated the same for the ground leads. While Rares Paul used hot melt glue to insulate the soldered leads, I used liquid insulation because I had some. The result, i think, looks quite neat.
+I have taken the idea from the build by Rares Paul on Printables and soldered the Vcc leads of each of the sensor pairs together and conected the Vcc of each pair together with a wire then repeated the same for the ground leads. While Rares Paul used hot melt glue to insulate the soldered leads, I used liquid insulation because I had some. The result, I think, looks quite neat.
