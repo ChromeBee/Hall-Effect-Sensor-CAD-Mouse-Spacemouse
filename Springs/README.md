@@ -11,7 +11,7 @@ All work but the effort needed to move them varies. The 0.4x12x4mm springs, in m
 The 0.3x10x3mm springs seem to require just slightly less force to the 0.4x12x4mm spring. The shorter length meaning that the spring is stretched more and offers more resistance
 The 0.2x12x4mm springs are very light to move in comparison to the other two.
 
-The strings are stretched to about 20mm in the home position so a longer spring should work and being under less tension, it should be easier to move.
+The springs are stretched to about 20mm in the home position so a longer spring should work and being under less tension, it should be easier to move.
 However it needs to be short enough to pull the magnet plate back to the home position when the mouse knob is released. Remember that the tension can be adjusted somewhat by moving the wire holder further up or down the M4 bolt.
 
 Another way to reduce the tension is to install a second wire holder on the bolt for the lower springs. The picture below shows an example of this. Although in the example it is just above their original position. The wire plate could be moved further up the M4 bolt.
@@ -87,4 +87,10 @@ The printed washer and final M4 nut go on top. The nuts should be tighted in suc
 
 ![Assembled device front and high](https://github.com/user-attachments/assets/0cb13960-e1b4-4d88-bf74-fa717aa7ebc7)
 
-I have taken the idea from the build by Rares Paul on Printables and soldered the Vcc leads of each of the sensor pairs together and conected the Vcc of each pair together with a wire then repeated the same for the ground leads. While Rares Paul used hot melt glue to insulate the soldered leads, I used liquid insulation because I had some. The result, I think, looks quite neat.
+To complete the mouse, I have taken the idea from the build by Rares Paul on Printables and soldered the Vcc leads of each of the sensor pairs together and conected the Vcc of each pair together with a wire then repeated the same for the ground leads (rather than use the servo connectors used previously). While Rares Paul used hot melt glue to insulate the soldered leads, I used liquid insulation because I had some. The result, I think, looks quite neat. The final step is to put on the case and the knob.
+
+![Both mice together V1](https://github.com/user-attachments/assets/0ac319b2-2e10-4d69-95dd-25d8bc1c6afc)
+
+When I printed the first mouse, I had intended to put it in a navy blue case which is why the internals were printed in the same colour. It first was in a grey case with a navy knob, before I put it in the dark grey and gold combo. This one I printed in the dark grey, intending to prnt the case in dark grey and a different bright colour but ended up with the Navy and Purple I used for my Cyberpuck design. 
+
+I have decided they should swap cases. I now have the grey and gold mouse beside me with the TPU "spring" mechanism and I really really like it.
