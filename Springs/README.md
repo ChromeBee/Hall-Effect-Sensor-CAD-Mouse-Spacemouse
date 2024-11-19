@@ -58,6 +58,8 @@ This uses two TPU "springs" that are slightly longer and with thinner mounting h
 <li>2 prints of the TPU hook.</li>
 <li>1 print of the magnet plate 0.3 from the original model. This is the magnet plate for 0.3mm springs.</li>
 <br>
+I am currently using the "Thin TPU spring 0.6x17mm.stl" with the TPU bolt plate. I have used both "springs" with both bolt plates and all combinations work. It is just down to how tight you want the mouse to feel. 
+
 The two "springs" are mounted so that one twists the mechanisim on one direction while the second twists it in the other cancelling out the rotational strain.
 I hope seeing this in pictures helps to explain what I mean.
 
@@ -87,7 +89,7 @@ The printed washer and final M4 nut go on top. The nuts should be tighted in suc
 
 ![Assembled device front and high](https://github.com/user-attachments/assets/0cb13960-e1b4-4d88-bf74-fa717aa7ebc7)
 
-To complete the mouse, I have taken the idea from the build by Rares Paul on Printables and soldered the Vcc leads of each of the sensor pairs together and conected the Vcc of each pair together with a wire then repeated the same for the ground leads (rather than use the servo connectors used previously). While Rares Paul used hot melt glue to insulate the soldered leads, I used liquid insulation because I had some. The result, I think, looks quite neat. The final step is to put on the case and the knob.
+To complete the mouse, I have taken the idea from the build by Rares Paul on Printables and soldered the Vcc leads of each of the sensor pairs together and conected the Vcc of each pair together with a wire then repeated the same for the ground leads (rather than use the servo connectors used previously). While Rares Paul used hot melt glue to insulate the soldered leads, I used liquid insulation because I had some. The result, I think, looks quite neat. I have also added silicone none slip feet to the arduino plate as trialed in my video, https://youtu.be/bVAX9b2wB6A?si=tlR51EHB5Pdp-rGi - The final step is to put on the case and the knob.
 
 ![Both mice together V1](https://github.com/user-attachments/assets/0ac319b2-2e10-4d69-95dd-25d8bc1c6afc)
 
