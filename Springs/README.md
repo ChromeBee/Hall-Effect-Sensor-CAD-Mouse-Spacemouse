@@ -96,3 +96,8 @@ To complete the mouse, I have taken the idea from the build by Rares Paul on Pri
 When I printed the first mouse, I had intended to put it in a navy blue case which is why the internals were printed in the same colour. It first was in a grey case with a navy knob, before I put it in the dark grey and gold combo. This one I printed in the dark grey, intending to prnt the case in dark grey and a different bright colour but ended up with the Navy and Purple I used for my Cyberpuck design. 
 
 I have decided they should swap cases. I now have the grey and gold mouse beside me with the TPU "spring" mechanism and I really really like it.
+
+<b>24-Nov-2024 Update</b>
+I was a bit concerned that the TPU spring holder being used could interfere with the mounts on the knob. I haven't experienced any problem, but once I had the thought, I coundn't let it go so I created a version with a smaller diameter TPU Spring Holder. This of course needed different TPU springs, so I created them as well. These can be found in the smaller TPU Hook subfolder of the STL folder. I picture of the resulting mouse is below.
+
+![small TPU hook mounted](https://github.com/user-attachments/assets/d740c223-0e03-4a8c-b7b2-7aaa47d64a98)
