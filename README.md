@@ -142,6 +142,8 @@ The 3D connexions driver is fairly flexible on the range of values the mouse sen
 I have found that with the magnets I'm using that a distance between the magnet plate and the sensors of just under 4mm works best. I have a small dowel stick that I've used as a pointer in some videos and its diameter is just under 4mm. If it just about fits, with a push, between the magnet plate and sensor plate then I'm about at the correct distance.
 
 If the mouse works for tilting and twisting but not lateral movements of left/right and up/down, then the gap is too large and should be reduced. 
+
+I have also added the TPU cap keeper that I added to Printables a few days ago. This, printed in TPU, fits on the knob cap and holds it to the knob, if loose. It wasn't needed for my first build but a subsequent print using a differet brand of filament, I found the cap was loose. This solves that problem.
 <b>End-of-update</b>
 
 This is what I've been able to discover that the button report can contain. The Spacemouse pro wireless supports 18 programmable buttons although the code indicates more. There are 4 bytes in the report and depending on what bit is set to 1 it causes the following to happen.
