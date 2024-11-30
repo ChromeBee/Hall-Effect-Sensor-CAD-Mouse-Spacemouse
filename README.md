@@ -141,7 +141,7 @@ The 3D connexions driver is fairly flexible on the range of values the mouse sen
 <b>24-Nov-2024 Update</b>
 I have found that with the magnets I'm using that a distance between the magnet plate and the sensors of just under 4mm works best. I have a small dowel stick that I've used as a pointer in some videos and its diameter is just under 4mm. If it just about fits, with a push, between the magnet plate and sensor plate then I'm about at the correct distance.
 
-If the mouse works for tilting and twisting but not lateral movements of left/right and up/down, then the gap is too large and should be reduced. 
+If the mouse works for tilting and twisting but not lateral movements of left/right and forward/backward, then the gap is too large and should be reduced. 
 
 I have also added the TPU cap keeper that I added to Printables a few days ago. This, printed in TPU, fits on the knob cap and holds it to the knob, if loose. It wasn't needed for my first build but a subsequent print using a differet brand of filament, I found the cap was loose. This solves that problem.
 <b>End-of-update</b>
