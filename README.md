@@ -96,7 +96,7 @@ A second set of nuts is added to the 20mm bolts holding on the bolt plate, then 
 
 ![DSC05614](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/09749bd8-3714-411c-8503-8e7d2a5fded3)
 
-Loading the software on to the Arduino pro micro and setting debug level to 1, we can ensure, by bringing a magnet close to each sensor, that the sensor works, is correctly connected and which pole of the magnet is being presented to it. Once we have identified the north pole of the magnet we can glue 4 10x5x3mm magnets into the magnet holder. The north pole should face downward, that is towards the side of the magnet plate with a slot in the area were the magnets go.
+Loading the software on to the Arduino pro micro and setting debug level to 1, we can ensure, by bringing a magnet close to each sensor, that the sensor works, is correctly connected and which pole of the magnet is being presented to it. Once we have identified the north pole of the magnet we can glue 4 10x5x3mm magnets into the magnet holder. The north pole is the one that causes the numbers to decrease when moved towards the sensors. The north pole should face downward, that is towards the side of the magnet plate with a slot in the area were the magnets go.
 
 ![DSC05616](https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/assets/141455861/5cc63cbd-342c-4449-ac5e-858ab9c8cb56)
 
