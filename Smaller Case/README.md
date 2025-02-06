@@ -20,5 +20,5 @@ curve or the case needing made tighter and reducing the internal lip so that it 
 <p>The internal mechanism remains unchanged. The only changes are to the knob and the case and the buttons (1mm longer).
 I have also hollowed out the knob cap more, though I'm still using the original version.</p>
 <h2> Is it worth it?</h2>
-<p>Good question. I can't detect any major improvement so if you are happy with the original version, I wouldn't change it.
-If you fancy a smaller version, then why not try this.</p>
+<p>Good question. I can't detect any major improvement with the movement so if you are happy with the original version, I wouldn't change it.
+If you fancy a smaller version, this is only 6.25mm smaller but why not try it. It only costs the price of the filament and 4 brass heat press inserts.</p>
