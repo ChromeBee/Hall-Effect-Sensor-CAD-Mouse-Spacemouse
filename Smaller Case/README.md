@@ -22,3 +22,8 @@ I have also hollowed out the knob cap more so there is less chance it interferin
 <h2> Is it worth it?</h2>
 <p>Good question. I can't detect any major improvement with the movement so if you are happy with the original version, I wouldn't change it.
 If you fancy a smaller version, this is only 6.25mm smaller but why not try it. It only costs the price of the filament and 4 brass heat press inserts.</p>
+<h2>Update 17-March-2025 Base for smaller case</h2>
+<p>I've added an STL file for a base to fit the smaller case version. Birdy67 on printables pointed out that the original design base didn't fit well with the smaller case. As I don't use the base myself, but use homemade silicone feet on the Arduino plate, I hadn't realised that the changes to the case would also affect the base.</p>
+<p>Creating the base was easy as it was already part of the design and the modifications I made for the case were automatically reflected in the base so I just needed to export it. I have not printed it myself as I don't need it, so it is untested.</p>
+<p>I apologise to everyone that has encountered this issue. I hope this new part fulfils you needs.</p>
+
