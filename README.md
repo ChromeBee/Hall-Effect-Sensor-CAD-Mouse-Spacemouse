@@ -138,7 +138,7 @@ This is the same process as the teaching Tech model and is covered on their Open
 
 The process is also covered in the comments in the Arduino sketch. It involves setting up a custom Arduino board that the 3D connexion software recognises as a Spacemouse Pro Wireless.
 
-The 3D connexions driver is fairly flexible on the range of values the mouse sends to it for it to work. To have the most flexible range, both in positiva and negative directions, with debug set to 1, and analogRference(DEFAULT) I.e. 5 volts, the outputs should be reading around the value of 342. If the analogReference(INTERNAL) is set then, the mid range value should be around 684. You can adjust the distance of the sensor plate from the magnet plate to adjust this. Each corner can be adjusted independently.
+The 3D connexions driver is fairly flexible on the range of values the mouse sends to it for it to work. To have the most flexible range, both in positive and negative directions, with debug set to 1, and analogRference(DEFAULT) I.e. 5 volts, the outputs should be reading around the value of 342. If the analogReference(INTERNAL) is set then, the mid range value should be around 684. You can adjust the distance of the sensor plate from the magnet plate to adjust this. Each corner can be adjusted independently.
 
 <b>24-Nov-2024 Update</b>
 I have found that with the magnets I'm using that a distance between the magnet plate and the sensors of just under 4mm works best. I have a small dowel stick that I've used as a pointer in some videos and its diameter is just under 4mm. If it just about fits, with a push, between the magnet plate and sensor plate then I'm about at the correct distance.
@@ -160,6 +160,27 @@ This is what I've been able to discover that the button report can contain. The 
 <TR><B><TD>bit 6</TD></B><TD>-----</TD><TD>Internet</TD><TD>ESC key</TD><TD>-----</TD></TR>
 <TR><B><TD>bit 7</TD></B><TD>-----</TD><TD>Copy key</TD><TD>ALT key</TD><TD>-----</TD></TR>
 </TABLE>
+
+<b>09-Aug-2025 Update</b>
+After a year of no code changes, I have made a couple.
+The code has always had one pseudo button. By pressing the left and right buttons at the same time, it opens the 3DConnections configuration menu.
+Now I have added two new pseudo buttons operated by pressing the front button and one of the other two buttons at the same time.
+
+Pressing the front button together with the left button starts and stops rotation lock.
+Pressing the front button together with the right button is fit to screen.
+
+The three buttons pressed on their own change the view to plan, right and front.
+
+All buttons can be reassigned to provide different actions through the 3DConnections configuration menu which you can get at by pressing both the button on the left and the button on the right simultaneously.
+
+The actions described are for CAD software and may do different functions in different software. All have been tested with both Fusion and On-Shape.
+
+The second change is to remove the Speed parameter in the code. This reduced the amount of movement permitted to 80% by default. As this function is also provided by through the 3DConnections configuration menu, it was redundant to have it in the code as well. This was a left over from the Teaching Tech Big Foot code which this code was originally based on.
+
+You don't have to use my code with this mouse. I will point you to AndunHH's excellent GitHub spacemouse repository:
+https://github.com/AndunHH/spacemouse
+
+This code has frequent updates from multiple people, supports different mice hardware designs including this one and offers support for additional accessories such as LEDs and scroll wheels. The code is much more sophisticated than mine.
 
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
