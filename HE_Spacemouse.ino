@@ -28,7 +28,10 @@
  * C003 - 25-Jul-24 - Added define for movement3DC to switch between default 3DConnexion axis movement and Teaching Techs default movement
  * C004 - 04-Aug-24 - bug fix - Changed key reporting so that a zero report is sent when the final key is released.
  *                    Changed the place where duplicate keys reports are supressed. Used to be in the key rutine now in the report routine
- * C006 - 08-Aug-24 - bug fix - After logical button was pressed, all buttons were being sent in state 4. Now corrected.                   
+ * C006 - 08-Aug-24 - bug fix - After logical button was pressed, all buttons were being sent in state 4. Now corrected. 
+ * C007 - 07-Aug-25 - Adding two more pseudo buttons. Achieved by pressing front button at the same time as one of the side buttons.
+ *                    These give TAB/Rotate lock (Left and fromt button) and Fit to screen (Right and front button) by default
+ * C008 - 09-Aug-25 - Remove Speed adjustment left over from TT code - This can be controlled through 3DConections configuration menu.
  ************************************************/
  
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
@@ -64,7 +67,7 @@ bool invRZ = false; // Rotate around Z axis (twist left/right)
 
 // Speed
 // Modify to change sensitibity/speed. Default and maximum 100. Works like a percentage ie. 50 is half as fast as default. This can also be done per application in the 3DConnexion software.
-int16_t speed = 80;
+// int16_t speed = 80; C008 - remove this as it can be controlled through 3dConnection software
 
 
 // Default Assembly when looking from above: *JC modified for Hall Effect Sensors (HES)
@@ -179,8 +182,10 @@ void readAllFromSensors(int *rawReads){
 // keystate 2 - 1&3 pressed within time limit
 // keystate 3 = 1&3 not pressed within time limit
 // keyState 4 = Wait until physical buttons released to reset state.
+// C007 changed logic from above now waits for any two buttons to be pressed and keyState 5 is called when button 1 & 2 are pressed together and keyState 6 when buttons 2 & 3 are pressed
 unsigned long keyTimeNew, keyTimeOld = 0;
-uint8_t keyState = 0, keyPressed = 0, oldButtonValues[4] = {0,0,0,0}; // C004 - *JC - keyPresed added to keep track of last key pressed (in state machine).
+uint8_t keyState = 0, keyPressed = 0; // C004 - *JC - keyPresed added to keep track of last key pressed (in state machine).
+// uint8_t oldButtonValues[6] = {0,0,0,0}; no longer used with state machine
 
 void readAllFromButtons(uint8_t *buttonValues){
   for(int i=1; i<4; i++){ // read real button values
@@ -188,26 +193,32 @@ void readAllFromButtons(uint8_t *buttonValues){
   }
 
   // C002 - *JC changed logic for handling pseudo/logical switch (two buttons pressed at once gives different function)
-  buttonValues[0] = false;
+  // c007 - *JC added entries 4 and 5 for new pseudo buttons. 0 is the existing one.
+  buttonValues[0] = buttonValues[4] = buttonValues[5] = false;
   keyTimeNew = millis();
   switch(keyState) {
     case 0: // no button pressed so far
-     if (buttonValues[1] || buttonValues[3]) {
+     if (buttonValues[1] || buttonValues[3] || buttonValues[2]) { // C007 - *JC - added buttonValues[2]
        if (debug == 6) Serial.println("keyState 0 - button pressed move to keyState 1");
        keyState = 1;
        keyTimeOld = keyTimeNew;
-       buttonValues[1] = buttonValues[3] = false; // don't send button values yet.
+       buttonValues[1] = buttonValues[3] = buttonValues[2] = false; // don't send button values yet. C007 - *JC added ButtonValues 2 to the list
      }
      break;
 
      case 1: // button 1 or 3 pressed - what has happened with the elapsed time
      if (debug == 6) Serial.println("keyState 1 - one button pressed");
-     if (keyTimeNew - keyTimeOld > 15) {
+     if (keyTimeNew - keyTimeOld > 20) { // C007  - changed the waiting time from 15 to 20 as 15 seemed to short for ackward double button presses
        keyState = 3; // second button not pressed
      } else if (buttonValues[1] && buttonValues[3]) {
-       keyState = 2; // second button pressed
-     }
-     buttonValues[1] = buttonValues[3] = false; // don't send button values yet
+       keyState = 2; // second button pressed pseudo button 1
+     } else if (buttonValues[1] && buttonValues[2]) { // start of C007 changes - this introduces 2 new states for the two new pseudo buttons
+       keyState = 5; // second button pressed pseudo button 2
+     } else if (buttonValues[2] && buttonValues[3]) {
+       keyState = 6; // second button pressed pseudo button 3
+     } // end of C007 changes
+    
+     buttonValues[1] = buttonValues[3] = buttonValues[2] = false; // don't send button values yet - C007 - *JC added buttonValues[2] to the list
      break;
 
      case 2: // second button pressed - set logical button
@@ -223,6 +234,8 @@ void readAllFromButtons(uint8_t *buttonValues){
      keyState = 4;
      if (buttonValues[1]) { // C004 - *JC - record which button was pressed and will be reported
       keyPressed = 1;
+     } else if (buttonValues[2]) { // C007 - *JC - added extra button to possible two button presses
+       keyPressed = 2;
      } else {
       keyPressed = 3;
      }
@@ -231,13 +244,30 @@ void readAllFromButtons(uint8_t *buttonValues){
      case 4: //wait until buttons released to reset state
      if (debug == 6) Serial.println("keyState 4 - wait for buttons to be released before resetting state");
 
-     if (!buttonValues[1] && !buttonValues[3]) {
+     if (!buttonValues[1] && !buttonValues[3] && !buttonValues[2]) { // C007 - *JC added buttonValues[2]
        keyState = 0;   
      }
-     buttonValues[0] = buttonValues[1] = buttonValues[3] = false; //C005 - *JC - bug fix. Was here before but was removed for the last release
+     buttonValues[0] = buttonValues[1] = buttonValues[3] = buttonValues[2] = false; //C005 - *JC - bug fix. Was here before but was removed for the last release
      buttonValues[keyPressed] = true; // C004 - *JC - keep the keys pressed.
 
      break;
+
+     case 5: // C007 -*JC - second pseudo button
+     if (debug == 6) Serial.println("keyState 5 - second button pressed - set logical button");
+     buttonValues[4] = true;
+     keyState = 4;
+     keyPressed = 4; // C004 - *JC - record button 0 pressed
+     buttonValues[1] = buttonValues[2] = buttonValues[3] = false;
+     break;
+
+    case 6 :  // C007 - *JC - third pseudo button
+     if (debug == 6) Serial.println("keyState 6 - second button pressed - set logical button");
+     buttonValues[5] = true;
+     keyState = 4;
+     keyPressed = 5; // C004 - *JC - record button 0 pressed
+     buttonValues[1] = buttonValues[2] = buttonValues[3] = false;
+     break;
+
 }
 
       
@@ -288,6 +318,8 @@ void setup() {
   // Read idle/centre positions for Sensors.
   // *JC - First read gives unpredictable values so do it twice
   readAllFromSensors(centerPoints);
+  delay(1000);
+  readAllFromSensors(centerPoints);
   readAllFromSensors(centerPoints);
 }
 
@@ -310,10 +342,10 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   //  bit 5 - front view File
   //  bit 6 - no function?
   //  bit 7 - no function?
-  uint8_t btn[4] ={32*buttonValues[3]+16*buttonValues[2]+4*buttonValues[1]+buttonValues[0],0,0,0};
-  if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]!=keyChange) { // C004 - *JC - changed operation *JC - only send report if a button is pressed
+  uint8_t btn[4] ={32*buttonValues[3]+16*buttonValues[2]+4*buttonValues[1]+buttonValues[0]+2*buttonValues[5],0,0,4*buttonValues[4]}; // C007 added 2nd Pseudo button as Fit to Screen
+  if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]!=keyChange) { // C004 - *JC - changed operation *JC - only send report if a button is pressed C007 added new pseudo buttons to check
     HID().SendReport(3,btn,4);
-    keyChange = buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]; // C004 - *JC - record keys pressed for next time through the loop
+    keyChange = buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]; // C004 - *JC - record keys pressed for next time through the loop C007 added new pseudo buttons to keychange value
     if (debug == 6) {Serial.print("keyChange = "); Serial.println(keyChange);} // C005 - *JC - to help debug key press issues
 
   }
@@ -321,11 +353,13 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 
 void loop() {
   int rawReads[8], centered[8];
-  uint8_t buttonReads[4];
+  uint8_t buttonReads[6]; // C007 - *JC added two more values for two extra pseudo buttons
+
   // sensor values are read. range should be 176 - 1024 for debug levels other than 1 and 88-860 for debug 1
   readAllFromSensors(rawReads);
   // button values true or false
   readAllFromButtons(buttonReads);
+
   // Report back 0-1023 raw ADC 10-bit values if enabled
   if(debug == 1){ 
     Serial.print("HES0:"); Serial.print(rawReads[0]); Serial.print(",");
@@ -398,14 +432,17 @@ void loop() {
   rotX = (centered[HES0]+centered[HES1]-centered[HES6]-centered[HES7])/2;
   rotY = (centered[HES8]+centered[HES9]-centered[HES2]-centered[HES3])/2;
   rotZ = (centered[HES0]+centered[HES2]+centered[HES6]+centered[HES8]-centered[HES1]-centered[HES3]-centered[HES7]-centered[HES9])/4; // C0001 *JC - changed default direction of rotation
+
 // *JC - modified speed calculation to allow for the fact that this is integer calculations
 // so do multiplications prior to divisions to maintain maximum accuracy.
-  transX = (transX*speed)/100;
+// C008 now removed
+/*  transX = (transX*speed)/100;
   transY = (transY*speed)/100;
   transZ = (transZ*speed)/100;
   rotX = (rotX*speed)/100;
   rotY = (rotY*speed)/100;
-  rotZ = (rotZ*speed)/100;
+  rotZ = (rotZ*speed)/100; */
+
 // Invert directions if needed
   if(invX == true){ transX = transX*-1;};
   if(invY == true){ transY = transY*-1;};
