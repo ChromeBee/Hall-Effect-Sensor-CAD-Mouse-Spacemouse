@@ -101,3 +101,10 @@ I have decided they should swap cases. I now have the grey and gold mouse beside
 I was a bit concerned that the TPU spring holder being used could interfere with the mounts on the knob. I haven't experienced any problem, but once I had the thought, I coundn't let it go so I created a version with a smaller diameter TPU Spring Holder. This of course needed different TPU springs, so I created them as well. These can be found in the smaller TPU Hook subfolder of the STL folder. I picture of the resulting mouse is below.
 
 ![small TPU hook mounted](https://github.com/user-attachments/assets/d740c223-0e03-4a8c-b7b2-7aaa47d64a98)
+
+<b>09-Aug-2025 Update</b>
+Yesterday I came across an interesting YouTube short - A demonstration of a different design of TPU spring from someone called Trev-erse.
+
+![New TPU spring design by trev-erse small](https://github.com/user-attachments/assets/fcc5bd3d-3121-40ee-8e08-af23050a8423)
+
+If I were starting now, I might use this. I can see it attached to the base, PCB or sensor plate and directly to the magnet plate. it could make for a smaller design.
