@@ -182,6 +182,13 @@ https://github.com/AndunHH/spacemouse
 
 This code has frequent updates from multiple people, supports different mice hardware designs including this one and offers support for additional accessories such as LEDs and scroll wheels. The code is much more sophisticated than mine.
 
+<b>14-Aug-2025 Update</b>
+I have modified the code again. I never used the buttons on the mouse until recently. Having found the 'fit to screen' and to a much leser extent, 'rotation lock', useful. I decided to use the left and right buttons directly to implement these. That meant removing the 'Plan view' and 'Right view' from these buttons. I then decided that the front button should cycle through the three views. So now pressing the front button will give a different view on each press, cycling from 'Front view' to 'Right view' to 'Plan view'. The front button together with the left button now rotates the view by 90 degrees and the front button together with the right button removes the project browser in Fusion and brings up a number pad in On-Shape. This is effectively implementing the function of 8 buttons using only 3.
+
+Pressing the left and right buttons together brings up the 3Dconnections configuration menu as normal.
+
+If you are intending to re-map the buttons, then having a button that changes what button it is pretending to be each time it is pressed makes that more difficult, however by setting the variable cycleButton from true to false will stop this and change the mapping back to the previous version.
+
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
 This work is licensed under a
