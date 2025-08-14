@@ -1,4 +1,4 @@
-<h2>Springs</h2>
+![Wave spring printed parts](https://github.com/user-attachments/assets/e1c3567d-9d91-4a5d-9e7c-1f8f910d742c)<h2>Springs</h2>
 I have had a large bag of 0.2 mm tension or extension springs for years. The smallest length of spring in the bag, 12mm, is what I've used for this project.
 The exact same spring as I've used seems to be difficult to find at a reasonable price. Even though I don't need them, I thought I would try a couple of different sizes to see how they perform.
 I bought some 0.4x12x4mm and some 0.3x10x3mm springs from Amazon UK.
@@ -108,3 +108,12 @@ Yesterday I came across an interesting YouTube short - A demonstration of a diff
 ![New TPU spring design by trev-erse small](https://github.com/user-attachments/assets/fcc5bd3d-3121-40ee-8e08-af23050a8423)
 
 If I were starting now, I might use this. I can see it attached to the base, PCB or sensor plate and directly to the magnet plate. it could make for a smaller design.
+
+<b>14-Aug-2025 Update</b>
+OK, I had to try it. I created a wave spring and a method to mount it to the mouse.
+
+![Wave spring printed parts](https://github.com/user-attachments/assets/c929d86d-445c-4b17-b052-77be3bc6ad67)
+![wave spring assembly](https://github.com/user-attachments/assets/b95c9f9e-360f-4607-8b44-a080b0ad9b79)
+![wave spring installed](https://github.com/user-attachments/assets/ad17f38f-73c4-4966-a588-7d1c21a7a7bc)
+
+Unfortunately, the wave spring in its current iteration needs stifening. With the knob on, it wobbles too much to be useful. I was concerned that this may be the case. Anyway, it you want to experiment with this then the STL and design files are in the wave spring subdirectory.  
