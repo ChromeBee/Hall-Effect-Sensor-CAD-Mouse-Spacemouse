@@ -32,6 +32,7 @@
  * C007 - 07-Aug-25 - Adding two more pseudo buttons. Achieved by pressing front button at the same time as one of the side buttons.
  *                    These give TAB/Rotate lock (Left and fromt button) and Fit to screen (Right and front button) by default
  * C008 - 09-Aug-25 - Remove Speed adjustment left over from TT code - This can be controlled through 3DConections configuration menu.
+ * C009 - 12-Aug-25 - Changed centre button to cycle through three views if enabled with cycleButton being true.
  ************************************************/
  
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
@@ -54,6 +55,12 @@ int debug = 0;
 // and pushing away or pulling it towards you controls up and down. I prefer this.
 // set to true for 3DConnection movement.
 bool movement3DC  = false;
+
+// switch between two modes of operation. The original mapping of buttons including pushing two at once or an alternative mapping where
+// the front button pretends to be three different buttons mapping to three views.
+bool cycleButton = true;
+uint8_t cycleInitialButton = 0; // Added to lowest pseudo button value
+const uint8_t buttonDelay = 20; // 20ms wait time for second button to be pressed
 
 // Direction
 // Modify the direction of translation/rotation depending on preference. This can also be done per application in the 3DConnexion software.
@@ -193,8 +200,9 @@ void readAllFromButtons(uint8_t *buttonValues){
   }
 
   // C002 - *JC changed logic for handling pseudo/logical switch (two buttons pressed at once gives different function)
-  // c007 - *JC added entries 4 and 5 for new pseudo buttons. 0 is the existing one.
-  buttonValues[0] = buttonValues[4] = buttonValues[5] = false;
+  // C007 - *JC added entries 4 and 5 for new pseudo buttons. 0 is the existing one.
+  // C009 - *JC if CycleButton is set to true then middle button (2) will set pseudo buttons 6, 7 and 8
+  buttonValues[0] = buttonValues[4] = buttonValues[5] = buttonValues[6] = buttonValues[7] = buttonValues[8] = false;
   keyTimeNew = millis();
   switch(keyState) {
     case 0: // no button pressed so far
@@ -208,7 +216,7 @@ void readAllFromButtons(uint8_t *buttonValues){
 
      case 1: // button 1 or 3 pressed - what has happened with the elapsed time
      if (debug == 6) Serial.println("keyState 1 - one button pressed");
-     if (keyTimeNew - keyTimeOld > 20) { // C007  - changed the waiting time from 15 to 20 as 15 seemed to short for ackward double button presses
+     if (keyTimeNew - keyTimeOld > buttonDelay) { // C007  - changed the waiting time from 15 to 20 as 15 seemed to short for ackward double button presses C009 changed number to a constant defined elsewhere
        keyState = 3; // second button not pressed
      } else if (buttonValues[1] && buttonValues[3]) {
        keyState = 2; // second button pressed pseudo button 1
@@ -235,14 +243,23 @@ void readAllFromButtons(uint8_t *buttonValues){
      if (buttonValues[1]) { // C004 - *JC - record which button was pressed and will be reported
       keyPressed = 1;
      } else if (buttonValues[2]) { // C007 - *JC - added extra button to possible two button presses
-       keyPressed = 2;
+     // C009 - *JC - if the flag cycleButton is set to true then button 2 will set one of three pseudo buttons
+     //              that will then be used to display one of three views on rotation
+       if (cycleButton)  { 
+         buttonValues[6+cycleInitialButton] = true;
+         keyPressed = 6+cycleInitialButton;
+         cycleInitialButton = (cycleInitialButton+1)%3;
+         if (debug == 6) {Serial.print("cycleInitialButton = "); Serial.println(keyPressed);}
+       } else {
+         keyPressed = 2;
+       }
      } else {
       keyPressed = 3;
      }
      break;
 
      case 4: //wait until buttons released to reset state
-     if (debug == 6) Serial.println("keyState 4 - wait for buttons to be released before resetting state");
+     //if (debug == 6) Serial.println("keyState 4 - wait for buttons to be released before resetting state");
 
      if (!buttonValues[1] && !buttonValues[3] && !buttonValues[2]) { // C007 - *JC added buttonValues[2]
        keyState = 0;   
@@ -343,9 +360,15 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   //  bit 6 - no function?
   //  bit 7 - no function?
   uint8_t btn[4] ={32*buttonValues[3]+16*buttonValues[2]+4*buttonValues[1]+buttonValues[0]+2*buttonValues[5],0,0,4*buttonValues[4]}; // C007 added 2nd Pseudo button as Fit to Screen
-  if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]!=keyChange) { // C004 - *JC - changed operation *JC - only send report if a button is pressed C007 added new pseudo buttons to check
+  if (cycleButton) { // C009 use pseudo buttons to select views - button 2 controls which view is selected.
+    btn[0] = 32*buttonValues[6]+16*buttonValues[7]+4*buttonValues[8]+buttonValues[0]+2*buttonValues[1];
+    btn[1] = buttonValues[4]+16*buttonValues[5];
+    btn[3] = 4*buttonValues[3];
+  }
+    if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]+64*buttonValues[6]+128*buttonValues[7]+256*buttonValues[8]!=keyChange) { // C004 - *JC - changed operation *JC - only send report if a button is pressed C007 added new pseudo buttons to check
+    if (debug == 6) {Serial.print("btn[0] = ");Serial.print(btn[0]);Serial.print(" btn[1] = ");Serial.print(btn[1]);Serial.print(" btn[2] = ");Serial.print(btn[2]);Serial.print(" btn[3] = ");Serial.println(btn[3]); }
     HID().SendReport(3,btn,4);
-    keyChange = buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]; // C004 - *JC - record keys pressed for next time through the loop C007 added new pseudo buttons to keychange value
+    keyChange = buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]+64*buttonValues[6]+128*buttonValues[7]+256*buttonValues[8]; // C004 - *JC - record keys pressed for next time through the loop C007 added new pseudo buttons to keychange value
     if (debug == 6) {Serial.print("keyChange = "); Serial.println(keyChange);} // C005 - *JC - to help debug key press issues
 
   }
@@ -353,7 +376,7 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
 
 void loop() {
   int rawReads[8], centered[8];
-  uint8_t buttonReads[6]; // C007 - *JC added two more values for two extra pseudo buttons
+  uint8_t buttonReads[9]; // C007 - *JC added two more values for two extra pseudo buttons C009 added another 3 pseudo switches to cycle views when button 2 (front) pressed
 
   // sensor values are read. range should be 176 - 1024 for debug levels other than 1 and 88-860 for debug 1
   readAllFromSensors(rawReads);
