@@ -1,4 +1,4 @@
-![Wave spring printed parts](https://github.com/user-attachments/assets/e1c3567d-9d91-4a5d-9e7c-1f8f910d742c)<h2>Springs</h2>
+<h2>Springs</h2>
 I have had a large bag of 0.2 mm tension or extension springs for years. The smallest length of spring in the bag, 12mm, is what I've used for this project.
 The exact same spring as I've used seems to be difficult to find at a reasonable price. Even though I don't need them, I thought I would try a couple of different sizes to see how they perform.
 I bought some 0.4x12x4mm and some 0.3x10x3mm springs from Amazon UK.
