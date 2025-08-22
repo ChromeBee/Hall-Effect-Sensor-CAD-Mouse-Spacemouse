@@ -119,7 +119,7 @@ OK, I had to try it. I created a wave spring and a method to mount it to the mou
 Unfortunately, the wave spring in its current iteration needs stifening. With the knob on, it wobbles too much to be useful. I was concerned that this may be the case. Anyway, it you want to experiment with this then the STL and design files are in the wave spring subdirectory.  
 
 <b>18-Aug-2025 Update</b>
-Ok, so I've modified the TPU wave spring design to have three wave springs and this works!!!
+Ok, so I've modified the TPU wave spring design to have three wave springs and this works!!! Printed in 85A TPU.
 
 ![Triple wave spring](https://github.com/user-attachments/assets/03d9c452-1e0b-4602-91c1-0924a4a2241c)
 ![Triple wave spring installed](https://github.com/user-attachments/assets/893ffd7b-049d-4fa7-bee4-32e9839a2cad)
