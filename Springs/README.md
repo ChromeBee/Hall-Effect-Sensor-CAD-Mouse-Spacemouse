@@ -111,30 +111,4 @@ If I were starting now, I might use this. I can see it attached to the base, PCB
 
 <b>14-Aug-2025 Update</b>
 OK, I had to try it. I created a wave spring and a method to mount it to the mouse.
-
-![Wave spring printed parts](https://github.com/user-attachments/assets/c929d86d-445c-4b17-b052-77be3bc6ad67)
-![wave spring assembly](https://github.com/user-attachments/assets/b95c9f9e-360f-4607-8b44-a080b0ad9b79)
-![wave spring installed](https://github.com/user-attachments/assets/ad17f38f-73c4-4966-a588-7d1c21a7a7bc)
-
-Unfortunately, the wave spring in its current iteration needs stifening (printed with 85a TPU). With the knob on, it wobbles too much to be useful. I was concerned that this may be the case. Anyway, it you want to experiment with this then the STL and design files are in the wave spring subdirectory.  
-UPDATE: I've printed it again in (95A TPU and it works!!)
-
-<b>18-Aug-2025 Update</b>
-Ok, so I've modified the TPU wave spring design to have three wave springs and this works when printed in 85A TPU!!! It is too stiff when printed in 95A TPU.
-
-![Triple wave spring](https://github.com/user-attachments/assets/03d9c452-1e0b-4602-91c1-0924a4a2241c)
-![Triple wave spring installed](https://github.com/user-attachments/assets/893ffd7b-049d-4fa7-bee4-32e9839a2cad)
-
-It is a bit difficult to see in the photos so I have taked a screen shot from Fusion to show it clearer.
-
-![Tripple Wave Spring drawing](https://github.com/user-attachments/assets/391fbf62-dbd8-412b-a56d-5c88f0225423)
-
-I didn't explain on the initial update that the knob was modified slightly to enlarge the mounting tabs so that they hold the top of the wave spring assembly in place. I modified the knob for the smaller case version so that meant I had to print the rest of the case as the mouse mechanism I originally used for these experiments was originally in the original sized case. So this is what it now looks like.
-
-![Triple wave spring cased](https://github.com/user-attachments/assets/069078c1-d465-4ff1-9506-faa30e755196)
-
-The feel of the wave spring mouse is different to the normal TPU 'spring' version but closer to the original normal spring version. It is easier to move lateraly without accidentaly rotating at the same time. Is it too easy to move? That would be up to the individual. It seemed too sensitive in 123Design but I had never used a spacemouse with that program before but it is fine with Fusion and On-shape. I did turn down the sensitivity through the 3DConnexion menu.
-
-I sized the wave spring straight from the CAD design, so the knob is at the correct height for the case. It would be relatively easy to create other sizes, if needed, and all the separate components are available in the design file to make your own.
-
-This seems to be stretching Fusion and there are notable pauses if you change any of the variables used in the design to resize individual parts of the spring. Feel free to experiment.
+Full details in the 'experimental wave spring' directory.
