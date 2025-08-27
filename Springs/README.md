@@ -30,7 +30,7 @@ A search of eBay.co.uk for 0.2mm tension springs does provide listings of some s
 
 -------------
 YouTube recommended a video on the IndyMower to me. https://youtu.be/UnKOp4rhu7I?si=PoE8raFwQZSphymA
-In this video Nicodem Bartnik used TPU springs as part of a bumper sensor. YouTube has been recommending a lot of TPU videos to me recently so I took the hint and tried to 3D print TPU springs for the mouse. When I was going through the original thought experiments prior to starting anything, I had considered using those small rubber bands that were popular about 10 years ago for making frendship bracelets and other such items.
+In this video Nicodem Bartnik used TPU springs as part of a bumper sensor. YouTube has been recommending a lot of TPU videos to me recently so I took the hint and tried to 3D print TPU springs for the mouse. When I was going through the original thought experiments prior to starting anything, I had considered using those small rubber bands that were popular about 10 years ago for making friendship bracelets and other such items.
 
 The TPU spring I've come up with is printed flat and has a custom Wire holder (now TPU holder).
 
@@ -53,9 +53,9 @@ I'm going to stick with my 0.2mm springs but I've put the STL files for the 1mm 
 This uses two TPU "springs" that are slightly longer and with thinner mounting hooks so that two of these "springs" can be used at the same time. One of the issues with the TPU springs was that a pendulum like rotatary oscillation could occur. It was simple to eliminate by twisting the two TPU hooks located above and below the magnet plate in opposite directions. This twist in the springs would stop the oscillation but also put a rotational strain on the M4 nuts which could cause them to loosen over time. This design counteracts that but applies the same principle.
 
 <b>Additional parts needed:</b>
-<li>2 prints of either of the "Thin TPU spring 0.6x16mm.stl" or "Thin TPU spring 0.6x17mm.stl" obviously printed in TPU.</li>
+<li>2 prints of either of the "Thin TPU spring 0.6x16mm.stl" or "Thin TPU spring 0.6x17mm.stl" obviously printed in TPU. (I used 85A TPU)</li>
 <li>1 print of TPU Bolt Plate printed in PLA. This is just a shorter version of the orininal bolt plate without spring mounting slots. The original can still be used.</li>
-<li>2 prints of the TPU hook. (I used 85A TPU)</li>
+<li>2 prints of the TPU hook.</li>
 <li>1 print of the magnet plate 0.3 from the original model. This is the magnet plate for 0.3mm springs.</li>
 <br>
 I am currently using the "Thin TPU spring 0.6x17mm.stl" with the TPU bolt plate. I have used both "springs" with both bolt plates and all combinations work. It is just down to how tight you want the mouse to feel. 
@@ -112,3 +112,4 @@ If I were starting now, I might use this. I can see it attached to the base, PCB
 <b>14-Aug-2025 Update</b>
 OK, I had to try it. I created a wave spring and a method to mount it to the mouse.
 Full details in the 'experimental wave spring' directory.
+https://github.com/ChromeBee/Hall-Effect-Sensor-CAD-Mouse-Spacemouse/tree/main/Springs/Wave_Spring_Experiment
