@@ -52,3 +52,12 @@ A cap is placed on top of the spring and this holds the spring in place when the
 The design is parametric so if you change any of the Wave spring variables in the fusion design you can change the stiffness, length, width or other features of the spring.
 
 I have two versions of the spring. A single spring for printing in 95A TPU and a triple spring version for 85A TPU. Print them standing vertically without support. All files are in this directory.
+
+<b>30-Nov-2025 Update</b>
+Now a version of the wave spring is available in OnShape. Look for "TPU Spiral Wave Spring for CAD mouse".
+
+![OnShape](https://github.com/user-attachments/assets/ee6e0cb5-3048-4683-8c2f-7b6fc9b0aa27)
+
+The mountings for this are slightly different from the ones in the Fusion file so take them for OnShape as well.
+
+The Variable Spring_Horiz_Width set to 1mm seems to work quite well with 95A TPU while a value of 2mm works better for 85A TPU, but feel free to play arround with the various variables. Making the holes different shapes and sizes will affect how the mouse feels. Reduce the number of spirals to make it lighter to use and increase them if it is too light for you. Increase the Spring_Horiz_Width to make it harder to move horizontally and increase the Spring_Vert_height to make it harder to pull and push.
