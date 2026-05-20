@@ -33,10 +33,25 @@
  *                    These give TAB/Rotate lock (Left and fromt button) and Fit to screen (Right and front button) by default
  * C008 - 09-Aug-25 - Remove Speed adjustment left over from TT code - This can be controlled through 3DConections configuration menu.
  * C009 - 12-Aug-25 - Changed centre button to cycle through three views if enabled with cycleButton being true.
+ * C010 - 28-Feb-26 - Added code section by Jonas Edvinsson and added define to include it #define include_C010 comment this out to exclude it
+ * C011 - 11-May-26 - Altered the weights of the various movements.
+ * C012 - 17-May-26 - All sensor values change with any movement. For a lateral movement, say moveing the knob left, the main sensors are 0 and 7
+ *                    where the magnet moves over them and 1 and 6 where the magnet moves off them, but the magnets also move off sensors 2, 3, 8 and 9,
+ *                    giving a change in reading that contributes to the lateral reading. This change includes these sensor contributions to the movements.
  ************************************************/
  
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
 #include "HID.h"
+
+// Define to include C010 code by Jonas Edvinsson. Calibrate the mouse first before including it.
+// This change ignores small movement changes when there is a large one.
+// Comment out the define to exclude it.
+#define include_C010
+
+// Define to include C012 - just in case it causes problems
+// This change uses all 8 hall effect sensors to calculate all movements.
+// comment out the define below to exclude the change
+#define include_C012
 
 // Debugging
 // 0: Debugging off. Set to this once everything is working.
@@ -71,6 +86,24 @@ bool invZ = true; // pan up/down or zoom in/out // C003 *JC - 3DC default moveme
 bool invRX = false; // Rotate around X axis (tilt front/back)
 bool invRY = false; // Rotate around Y axis (tilt left/right)
 bool invRZ = false; // Rotate around Z axis (twist left/right)
+
+// C011 - different weights to different movements
+// This change is to give more prominence to certain movements.
+// For example it is more diffcult to move laterally than to zoom
+// so to try and even things out we can give lateral movements a bigger
+// weight than the zoom movement.
+// This works by multiplying the actual movement by the weight applied 
+// and dividing by the weightDivisor.
+// NOTE : Integer arritmetic is being used so divide rounds down.
+const int  transXWeight = 7; // change to 6 for previous operational feel
+const int  transYWeight = 7; // change to 6 for previous operational feel
+const int  transZWeight = 3;  // change to 3 for previous operational feel
+const int  rotXWeight = 6; // change to 6 for previous operational feel
+const int  rotYWeight = 6; // change to 6 for previous operational feel
+const int  rotZWeight = 4; // change to 3 for previous operational feel
+const int  weightDivisor = 12;
+
+
 
 // Speed
 // Modify to change sensitibity/speed. Default and maximum 100. Works like a percentage ie. 50 is half as fast as default. This can also be done per application in the 3DConnexion software.
@@ -285,34 +318,10 @@ void readAllFromButtons(uint8_t *buttonValues){
      buttonValues[1] = buttonValues[2] = buttonValues[3] = false;
      break;
 
+  }
 }
 
       
-/* C004 - *JC - move supression of sending multiple key reports to report sending routine. 
-// *JC - only send button value once 
-  for (int i=0;i<4;i++) {
-    if (buttonValues[i] == oldButtonValues[i]) {
-      buttonValues[i]=0; // send only once
-    } else {
-      if (debug == 6) {
-        Serial.print("Button "); Serial.print(i); Serial.print(" changed - Old Value ");Serial.print(oldButtonValues[i]); Serial.print(" New Value ");Serial.println(buttonValues[i]);
-      }
-      oldButtonValues[i] = buttonValues[i];   
-    }
-   }
-*/
-  //  based on real values set logical switch
-  /*  Old code to handle logical button - doesn't supress first button pressed action
-  if( buttonValues[1] && buttonValues[3]) {
-    buttonValues[0] = true;
-    buttonValues[1] = buttonValues[3] = false;
-  }
-  else
-  {
-    buttonValues[0] = false;
-  }
-  */
-}
 
 void setup() {
   // HID protocol is set.
@@ -449,12 +458,55 @@ void loop() {
   //rotZ = (+centered[AX] +centered[BX] +centered[CX] +centered[DX])/4;
   
   // *JC - Replaced Joystick calculations with ones for the Hall Effect Sensors
-  transX = (centered[HES1]-centered[HES0]+centered[HES6]-centered[HES7])/2;  
-  transY = (centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8])/2;  
-  transZ = (centered[HES0]+centered[HES1]+centered[HES2]+centered[HES3]+centered[HES6]+centered[HES7]+centered[HES8]+centered[HES9])/4;
-  rotX = (centered[HES0]+centered[HES1]-centered[HES6]-centered[HES7])/2;
-  rotY = (centered[HES8]+centered[HES9]-centered[HES2]-centered[HES3])/2;
-  rotZ = (centered[HES0]+centered[HES2]+centered[HES6]+centered[HES8]-centered[HES1]-centered[HES3]-centered[HES7]-centered[HES9])/4; // C0001 *JC - changed default direction of rotation
+  // C011 replaced the divide by 2 on shorter equasions and divide by 4 on longer ones with a configurable weight calculation
+  // C012 All movement calvulations now include all sensors even if their impact on the values returned will be small
+  #ifdef include_C012
+    transX = (centered[HES1]-centered[HES0]+centered[HES6]-centered[HES7]+centered[HES2]+centered[HES3]+centered[HES9]+centered[HES8])*transXWeight/weightDivisor;  //C012
+    transY = (centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8]+centered[HES1]+centered[HES0]+centered[HES6]+centered[HES7])*transYWeight/weightDivisor;  //C012
+  #else
+    transX = (centered[HES1]-centered[HES0]+centered[HES6]-centered[HES7])*transXWeight/weightDivisor;  // pre C012
+    transY = (centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8])*transYWeight/weightDivisor;  //pre C012
+  #endif 
+  transZ = (centered[HES0]+centered[HES1]+centered[HES2]+centered[HES3]+centered[HES6]+centered[HES7]+centered[HES8]+centered[HES9])*transZWeight/weightDivisor;
+  #ifdef include_C012
+    rotX = (centered[HES0]+centered[HES1]-centered[HES6]-centered[HES7]+centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8])*rotXWeight/weightDivisor;  // C012
+    rotY = (centered[HES8]+centered[HES9]-centered[HES2]-centered[HES3]-centered[HES1]+centered[HES0]-centered[HES6]+centered[HES7])*rotYWeight/weightDivisor;  // C012
+  #else
+    rotX = (centered[HES0]+centered[HES1]-centered[HES6]-centered[HES7])*rotXWeight/weightDivisor;  // pre C012
+    rotY = (centered[HES8]+centered[HES9]-centered[HES2]-centered[HES3])*rotYWeight/weightDivisor;  // pre C012
+  #endif
+  rotZ = (centered[HES0]+centered[HES2]+centered[HES6]+centered[HES8]-centered[HES1]-centered[HES3]-centered[HES7]-centered[HES9])*rotZWeight/weightDivisor; // C001 *JC - changed default direction of rotation
+
+  #ifdef include_C010 
+  // This section by Jonas Edvinsson
+  // C010... (After existing code where transX, transY, transZ, rotX, rotY, rotZ are calculated) ...
+
+  // 1. Settings
+  // How strong does the "noise" have to be relative to the main movement to be kept?
+  // 0.30 means: "If an axis is less than 30% of the strongest force, kill it."
+  // Higher number (0.50) = Stricter, feels more robotic (good for CAD views).
+  // Lower number (0.15) = Looser, allows more fluid diagonal movement.
+  float noiseRatio = 0.35;
+  // 2. Find the strongest movement (The "Dominant" Axis)
+  int16_t maxVal = 0;
+  if (abs(transX) > maxVal) maxVal = abs(transX);
+  if (abs(transY) > maxVal) maxVal = abs(transY);
+  if (abs(transZ) > maxVal) maxVal = abs(transZ);
+  if (abs(rotX) > maxVal) maxVal = abs(rotX);
+  if (abs(rotY) > maxVal) maxVal = abs(rotY);
+  if (abs(rotZ) > maxVal) maxVal = abs(rotZ);
+  // 3. Filter out the weak "noise" movements
+  // We calculate a dynamic threshold based on your current hardest press.
+  int16_t dynamicThreshold = maxVal * noiseRatio;
+  if (abs(transX) < dynamicThreshold) transX = 0;
+  if (abs(transY) < dynamicThreshold) transY = 0;
+  if (abs(transZ) < dynamicThreshold) transZ = 0;
+  if (abs(rotX) < dynamicThreshold) rotX = 0;
+  if (abs(rotY) < dynamicThreshold) rotY = 0;
+  if (abs(rotZ) < dynamicThreshold) rotZ = 0;
+
+  // end C010... (Before existing code for "Invert directions" and "send_command"
+  #endif // end of C010 change
 
 // *JC - modified speed calculation to allow for the fact that this is integer calculations
 // so do multiplications prior to divisions to maintain maximum accuracy.
