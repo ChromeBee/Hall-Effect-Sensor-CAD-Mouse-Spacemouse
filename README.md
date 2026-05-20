@@ -189,6 +189,35 @@ Pressing the left and right buttons together brings up the 3Dconnections configu
 
 If you are intending to re-map the buttons, then having a button that changes what button it is pretending to be each time it is pressed makes that more difficult, however by setting the variable cycleButton from true to false will stop this and change the mapping back to the previous version.
 
+<b>20-May-2026 Update</b>
+This is going to seem like a blog post.
+
+There are three changes been added to the code, all around movement. I'm going to talk about them in reverse order.
+
+The last change added (C012) uses all the sensors in all movement calculations. Previously only the z axis movements did this. I had tried this change previously but had to roll it back when it made the mouse behave worse but I subsequently realise that was because I made a mistake in the formulas I used, so now they are back and working. If you prefer the previous movement calculations you can have those by commenting out the line #define include_C012
+
+The next change (C011) is, I have added weights to all the movement calculations. I thought zoom was too sensitive and wanted to reduce it while increasing the sensitivity to X and Y axis lateral movement. So now each movement direction has a weight associated with it that is used to calculate how much the movement contributes to the total movement seen on screen. After playing around with various values on both my mice for several days (one with the crossed 85A TPU springs (see https://www.printables.com/model/1087923-hall-effect-spacemouse-cad-mouse-with-tpu-springs) and one with Innerbushmans alternative magnet plate 95A TPU (See https://www.printables.com/model/1566497-alternative-tpu-suspension-for-spacemouse)), I have ended up with values that are almost back to what the original code had built-in when I was only averaging sensor pair values (i.e. if I used 4 sensor pairs in the calculation I divided by 4. if I used only 2 sensor pairs, I divided by 2). This change works by multiplying each movement with its associated weight and dividing it by a global weight divisor. You can make the mouse more sensitive and react faster in the required directions by increasing the weights or globaly by decreasing the weightDivisor value.  I had the transXWeight and transYWeight set to 12 and the transZWeight set to 2 for a while before deciding that, for me the mouse was too sensitive on X and Y axis movement and the zoom was too slow. I encourage you to play with values and see what works best for you.
+
+This change also opens up the possibility of using, for example, one of the double button pushes that I never use to switch the mouse between different sensitivities by using the button push to change the weightDivisor value between a set of pre-set values. That would be pretty simple but then you'd want some way on knowing what the mouse was currently using. The obvious answer would be one or more addressable LEDs whose colour would indicate the pre-set in use. 
+
+The final change (C010) and the first added to the code is actually by Jonas Edvinsson on Printables. He added and posted a snippet of code that ignores small accidental movements that are below a particular threshold of the main movement. By default if a movement is less than 35% of another movement then it is ignored. I added this shortly after Jonas posted it but had other changes I wanted to try to see if they impacted his code. This may affect mouse calibration so I have included a method of excluding it by commenting out the line #define include_C010.
+I hope you like these changes.
+
+In other news, one of my mice died. I thought it was Pro Micro but it turned out it was a short across the 5V to ground on the sensor plate. Naturally it was the mouse where the sensors are stuck in using liquid insulation and it was no longer liquid nor soft. I couldn't remove any of the sensors so I decided to construct a new sensor plate and wanted to try an new method of getting power to all the sensors.
+
+<img width="995" height="500" alt="Two wiring options" src="https://github.com/user-attachments/assets/24526765-a239-4675-867a-a62be4bd1fea" />
+
+I finally decided to use copper tape and it works perfectly, even if the changes I made to the sensor plate for it are less than ideal. I still used liquid insulation on the sensors to protect the sensor wires. I hope I don't regret it.
+
+<img width="500" height="475" alt="new sensor plate wired" src="https://github.com/user-attachments/assets/a7c3d675-d70e-4413-969a-7a052d367855" />
+
+Later I found a 1.25mm picoblade connector on my desk and discovered the 49e hall effect sensor leads fit beautifully and it is so much smaller than the servo connectors. If I need to construct a new sensor plate again, I'll be using these to connect up the sensors.
+
+<img width="500" height="314" alt="Picoblade" src="https://github.com/user-attachments/assets/66632949-296f-47ee-95f0-7b0ac0f7017e" />
+
+<p></p>
+<p></p>
+
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
 This work is licensed under a
