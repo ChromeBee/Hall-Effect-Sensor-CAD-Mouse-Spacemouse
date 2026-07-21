@@ -136,3 +136,18 @@ His design opens up other possibilities. I played around with using his spring h
 This however got me wondering... Can we put the magnet plate there and have the sensors mounted so they appear inside the knob itself? Then the only thing outside the knob would be the buttons and the pro micro ( and the mount for the sensors and the rest of the hardware).
 
 I am aware that there are other mouse versions using similar springs such as this from LeoSpaceLab. https://youtu.be/LWE_vR1oFRo?si=dDvz3KJTkTcSgacW ( not a 6DOF mouse though the spring is) and Razberry on YouTube has a series where he tries to build the perfect mouse. This version by InnerBushman is for my mouse and and I know it works.
+
+<b>21-Jul-2026 Update</b>
+I woke up one morning wanting to create a dual material version of InnerBushmans combined TPU spring and Magnet plate. I let it lie for a couple of days but couldn't get it out of my head, so here it is.
+
+<img width="268" height="500" alt="3 PLA and TPU 3D printed springs" src="https://github.com/user-attachments/assets/d76ee5d6-a4d9-41cf-920c-b7e5fbe65e76" />
+
+With this version the TPU spring is embeded within the PLA Magnet plate. You don't need a fancy printer to make this. The TPU spring is printed first, then the PLA outer part is printed but the print is paused two layers before the end (0.2mm layer height) and the TPU spring inserted before continuing the print.
+
+In the picture above, The top version has the spring inserted the wrong way around. The middle one used 83A TPE and it was too floppy. The bottom one is the one I'm using at the moment and the spring part is printed in 95A TPU.
+
+<img width="512" height="339" alt="mouse with double material spring" src="https://github.com/user-attachments/assets/4024b56b-fb3b-48a3-9bd5-62569c8e57f3" />
+
+Is it any better than the InnerBushman version? Good question. I think the answer to that is probably no. It feels slightly different but that could just be my imagination. Anyway the STL files for this are available the STL directory together with the FreeCAD design file.
+
+Yes, this is the third CAD program I've used for updates to the mouse. I'm trying FreeCAD after a couple of issues with both Fusion and OnShape.
