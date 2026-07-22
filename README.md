@@ -188,7 +188,7 @@ I have modified the code again. I never used the buttons on the mouse until rece
 Pressing the left and right buttons together brings up the 3Dconnections configuration menu as normal.
 
 If you are intending to re-map the buttons, then having a button that changes what button it is pretending to be each time it is pressed makes that more difficult, however by setting the variable cycleButton from true to false will stop this and change the mapping back to the previous version.
-
+<p></p>
 <b>20-May-2026 Update</b>
 This is going to seem like a blog post.
 
@@ -214,6 +214,30 @@ I finally decided to use copper tape and it works perfectly, even if the changes
 Later I found a 1.25mm picoblade connector on my desk and discovered the 49e hall effect sensor leads fit beautifully and it is so much smaller than the servo connectors. If I need to construct a new sensor plate again, I'll be using these to connect up the sensors.
 
 <img width="500" height="314" alt="Picoblade" src="https://github.com/user-attachments/assets/66632949-296f-47ee-95f0-7b0ac0f7017e" />
+<br><p></p>
+<b>22-Jul-2026 Update</b>
+I've been thinking about the deadzone for the last couple of weeks. I have quite a high value of 40 for this, while from the comments on Printables and other places, some people are using a much lower value, even as low as 4. 
+There are 3 main reasons for having a deadzone.
+<ul>
+<br>
+<li>The first reason is to ignore jitter or variations in the readings the Arduino's analog to digital converter gives when reading the sensors output voltages when in its resting (in the centre position). When viewing debug outputs, the numbers appear to jump about a lot but when I measured the maximum variation over 1000 readings I found it was only 2 across all sensors. This means that a deadzone value just above this would be sufficient for this reason. </li>
+  <br>
+<li>The second reason is to deal with any possible failures in the centring mechanism in returning the mouse to the exact same resting position after any movement. No matter if the centring mechanism uses metal or TPU springs, rubber, elastic, silicone or some other means, the centring may not be perfect and we want to ignore any minor variations in returning to this position.</li>
+  <br>
+<li>The third reason is personal preference. Is the mouse too twitchy or not sensitive enough to your touch?</li>
+  <br>
+</ul>
+I'll stick to a value of 40. This works best for me.
+<p></p>
+<b>More code changes</b><br>
+I've also made a couple of updates to the code.
+
+<br>The first is related to the above. I've added a routine that will auto recentre the mouse if the readings for the current centre resting position is more than a certain threshold value away from what was previously recorded (C013). It determines this by ensuring all measurements, for a period of time, remain within this threshold of what it believes is the new centre position. I tried other methods for auto re-centring but this one seems to work best.
+<br><p></p>
+The other change is related to switching between different sensitivities. Something I mentioned considering in my last update. By pressing the centre and right buttons at the same time, it will switch between normal, half and quarter sensitivities (C014). This change was enabled by a previous change (C011) which allowed different movements to have different weighted priorities. 
+Both these changes can be switched off by commenting out the associated #define line that says to include them.
+<br><p></p>
+I also did a bit of a tidy-up to the code.
 
 <p></p>
 <p></p>
