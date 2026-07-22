@@ -27,17 +27,23 @@
  *                    suppress the default action of the two buttons pressed. Before I didn't supress the actions
  * C003 - 25-Jul-24 - Added define for movement3DC to switch between default 3DConnexion axis movement and Teaching Techs default movement
  * C004 - 04-Aug-24 - bug fix - Changed key reporting so that a zero report is sent when the final key is released.
- *                    Changed the place where duplicate keys reports are supressed. Used to be in the key rutine now in the report routine
+ *                    Changed the place where duplicate keys reports are supressed. Used to be in the key routine now in the report routine
  * C006 - 08-Aug-24 - bug fix - After logical button was pressed, all buttons were being sent in state 4. Now corrected. 
  * C007 - 07-Aug-25 - Adding two more pseudo buttons. Achieved by pressing front button at the same time as one of the side buttons.
  *                    These give TAB/Rotate lock (Left and fromt button) and Fit to screen (Right and front button) by default
  * C008 - 09-Aug-25 - Remove Speed adjustment left over from TT code - This can be controlled through 3DConections configuration menu.
- * C009 - 12-Aug-25 - Changed centre button to cycle through three views if enabled with cycleButton being true.
+ * C009 - 12-Aug-25 - Changed centre button to cycle through three views if enabled with include_cycleViews being defined
  * C010 - 28-Feb-26 - Added code section by Jonas Edvinsson and added define to include it #define include_C010 comment this out to exclude it
  * C011 - 11-May-26 - Altered the weights of the various movements.
  * C012 - 17-May-26 - All sensor values change with any movement. For a lateral movement, say moveing the knob left, the main sensors are 0 and 7
  *                    where the magnet moves over them and 1 and 6 where the magnet moves off them, but the magnets also move off sensors 2, 3, 8 and 9,
  *                    giving a change in reading that contributes to the lateral reading. This change includes these sensor contributions to the movements.
+ * C013 - 11-Jul-26 - Auto update center position, if drift detected. If the mouse sensor readings remain constant (within a set permitted variation) but
+ *                    different from the current recorded center position by more than the same margin for a set amount of time then update the
+ *                    recorded center position.
+ * C014 - 16-Jul-26 - Added sensitivity selector. Press the right and front mouse buttons simultaniously to step between full, half and quarter sensitivities
+ *                    This operates by stepping through 3 different weightDivisor values. This change was made possible by changes for C011
+ * 
  ************************************************/
  
 // Include inbuilt Arduino HID library by NicoHood: https://github.com/NicoHood/HID 
@@ -46,12 +52,12 @@
 // Define to include C010 code by Jonas Edvinsson. Calibrate the mouse first before including it.
 // This change ignores small movement changes when there is a large one.
 // Comment out the define to exclude it.
-#define include_C010
+#define include_IgnoreSmallChanges
 
 // Define to include C012 - just in case it causes problems
 // This change uses all 8 hall effect sensors to calculate all movements.
 // comment out the define below to exclude the change
-#define include_C012
+#define include_UseAllSensorsForAllMovement
 
 // Debugging
 // 0: Debugging off. Set to this once everything is working.
@@ -61,6 +67,8 @@
 // 4: Output translation and rotation values. Approx -500 to +500 depending on the parameter. *JC ADC reference 2.56v
 // 5: Output debug 3 and 4 side by side for direct cause and effect reference. *JC ADC reference 2.56v
 // 6: *JC Output debug info for pseudo key state machine. ( two keys pressed at once to simulate another key press)
+// 7: *JC output debug messages for Auto recenter code
+// 8: *JC output debug messages for sensitivity adjustment
 int debug = 0;
 
 // Choose between 3DConnexion default movement or Teaching Tech's
@@ -71,9 +79,26 @@ int debug = 0;
 // set to true for 3DConnection movement.
 bool movement3DC  = false;
 
+// C013 - detect drift of default home position and reset it 
+#define include_AutoRecenter  // comment this line out to remove auto recentering code
+
+#ifdef include_AutoRecenter
+// if we get sensor readings that are above the variation threshold of the center point (for 1 sensor or more) and we get continous
+// sensor readings within the variation threshold of this value for a set time then we assume this is our new center point
+// and reset the stored centerPoints to these new values.
+const int variationThreshold = 7; // Amount of drift permitted from the current centerPoints and the variations allowed in the new values
+const unsigned long stableTime = 1000; // time readings have to be within the variation threshold in milliseconds to cause the new readings to be accepted as teh new centerPoints
+// internal global variables for C013
+bool greaterThanThreshold = false; // does the current values exceed the variation threshold
+unsigned long startTime; // if so start a timer
+bool withinBounds,firstTime=true; // Are the new values within the variation threshold. first time outside the threshold start timer
+int oldCentered[8]; // what were the centered sensor value the last time through the loop
+#endif
+// end C013 setup
+
 // switch between two modes of operation. The original mapping of buttons including pushing two at once or an alternative mapping where
 // the front button pretends to be three different buttons mapping to three views.
-bool cycleButton = true;
+#define include_cycleViews
 uint8_t cycleInitialButton = 0; // Added to lowest pseudo button value
 const uint8_t buttonDelay = 20; // 20ms wait time for second button to be pressed
 
@@ -94,14 +119,20 @@ bool invRZ = false; // Rotate around Z axis (twist left/right)
 // weight than the zoom movement.
 // This works by multiplying the actual movement by the weight applied 
 // and dividing by the weightDivisor.
-// NOTE : Integer arritmetic is being used so divide rounds down.
+// NOTE : Integer arritmetic is being used so divide rounds down
 const int  transXWeight = 7; // change to 6 for previous operational feel
 const int  transYWeight = 7; // change to 6 for previous operational feel
 const int  transZWeight = 3;  // change to 3 for previous operational feel
 const int  rotXWeight = 6; // change to 6 for previous operational feel
 const int  rotYWeight = 6; // change to 6 for previous operational feel
 const int  rotZWeight = 4; // change to 3 for previous operational feel
-const int  weightDivisor = 12;
+int  weightDivisor = 12; // C014 removed the const
+
+// C014 - Variable weightDivisor - Sensitivity adjusment
+#define include_SensitivityAdjustment   // comment out to exclude C014 change and use press of right and front button together as normel button
+const int maxNumWeightDivisors = 3; // number of values in array below
+const int weightDivisorSelection[] = {12,24,48};
+int currentDivisorIndex = 0;
 
 
 
@@ -206,6 +237,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
 // Centerpoint variable to be populated during setup routine.
 int centerPoints[8];
 
+//-------------------------------------------------------------------------
 // Function to read and store analogue voltages for each joystick axis.
 void readAllFromSensors(int *rawReads){
   for(int i=0; i<8; i++){
@@ -213,6 +245,7 @@ void readAllFromSensors(int *rawReads){
   }
 }
 
+//-------------------------------------------------------------------------
 // *JC Function to read and store button values
 // When pressing two buttons at once for a different function, one button is usually pressed slightly before the other.
 // To prevent the first buttons function being triggered, we wait 15ms to see if another button is pressed in the meantime.
@@ -223,19 +256,23 @@ void readAllFromSensors(int *rawReads){
 // keystate 3 = 1&3 not pressed within time limit
 // keyState 4 = Wait until physical buttons released to reset state.
 // C007 changed logic from above now waits for any two buttons to be pressed and keyState 5 is called when button 1 & 2 are pressed together and keyState 6 when buttons 2 & 3 are pressed
+// keystate 5 - 1&2 pressed within time limit
+// keystate 6 - 2&3 pressed within time limit
+// C014 added code to intercept one of the pseudo buttons and adjust the sensitivity of the mouse
 unsigned long keyTimeNew, keyTimeOld = 0;
-uint8_t keyState = 0, keyPressed = 0; // C004 - *JC - keyPresed added to keep track of last key pressed (in state machine).
+uint8_t keyState = 0, keyPressed = 0; // C004 - *JC - keyPressed added to keep track of last key pressed (in state machine).
 // uint8_t oldButtonValues[6] = {0,0,0,0}; no longer used with state machine
 
 void readAllFromButtons(uint8_t *buttonValues){
+
   for(int i=1; i<4; i++){ // read real button values
     buttonValues[i] = !digitalRead(BTNLIST[i-1]);
   }
 
   // C002 - *JC changed logic for handling pseudo/logical switch (two buttons pressed at once gives different function)
   // C007 - *JC added entries 4 and 5 for new pseudo buttons. 0 is the existing one.
-  // C009 - *JC if CycleButton is set to true then middle button (2) will set pseudo buttons 6, 7 and 8
-  buttonValues[0] = buttonValues[4] = buttonValues[5] = buttonValues[6] = buttonValues[7] = buttonValues[8] = false;
+  // C009 - *JC if include_cycleViews is defined then middle button (2) will set pseudo buttons 6, 7 and 8
+  buttonValues[0] = buttonValues[4] = buttonValues[5] = buttonValues[6] = buttonValues[7] = buttonValues[8] = false; // all pseudo buttons set to false
   keyTimeNew = millis();
   switch(keyState) {
     case 0: // no button pressed so far
@@ -276,16 +313,16 @@ void readAllFromButtons(uint8_t *buttonValues){
      if (buttonValues[1]) { // C004 - *JC - record which button was pressed and will be reported
       keyPressed = 1;
      } else if (buttonValues[2]) { // C007 - *JC - added extra button to possible two button presses
-     // C009 - *JC - if the flag cycleButton is set to true then button 2 will set one of three pseudo buttons
+     // C009 - *JC - if include_cycleViews is defined then button 2 will set one of three pseudo buttons
      //              that will then be used to display one of three views on rotation
-       if (cycleButton)  { 
+       #ifdef include_cycleViews
          buttonValues[6+cycleInitialButton] = true;
          keyPressed = 6+cycleInitialButton;
          cycleInitialButton = (cycleInitialButton+1)%3;
          if (debug == 6) {Serial.print("cycleInitialButton = "); Serial.println(keyPressed);}
-       } else {
+       #else
          keyPressed = 2;
-       }
+       #endif
      } else {
       keyPressed = 3;
      }
@@ -297,7 +334,7 @@ void readAllFromButtons(uint8_t *buttonValues){
      if (!buttonValues[1] && !buttonValues[3] && !buttonValues[2]) { // C007 - *JC added buttonValues[2]
        keyState = 0;   
      }
-     buttonValues[0] = buttonValues[1] = buttonValues[3] = buttonValues[2] = false; //C005 - *JC - bug fix. Was here before but was removed for the last release
+     buttonValues[0] = buttonValues[1] = buttonValues[3] = buttonValues[2] = buttonValues[4] = buttonValues[5] = false; //C005 - *JC - bug fix. Was here before but was removed for the last release. C007 added extra pseudo buttons
      buttonValues[keyPressed] = true; // C004 - *JC - keep the keys pressed.
 
      break;
@@ -316,6 +353,12 @@ void readAllFromButtons(uint8_t *buttonValues){
      keyState = 4;
      keyPressed = 5; // C004 - *JC - record button 0 pressed
      buttonValues[1] = buttonValues[2] = buttonValues[3] = false;
+     // C014
+     #ifdef include_SensitivityAdjustment
+        currentDivisorIndex = (currentDivisorIndex+1)%maxNumWeightDivisors; // calculate new index value (step through values)
+        weightDivisor =  weightDivisorSelection[currentDivisorIndex]; // select related sensitivity divisor
+        if (debug == 8) {Serial.print("Current weightDivisor = ");Serial.println(weightDivisor);}
+     #endif  // include_SensitivityAdjustment end C014
      break;
 
   }
@@ -323,12 +366,13 @@ void readAllFromButtons(uint8_t *buttonValues){
 
       
 
+//-------------------------------------------------------------------------
 void setup() {
   // HID protocol is set.
   static HIDSubDescriptor node(_hidReportDescriptor, sizeof(_hidReportDescriptor));
   HID().AppendDescriptor(&node);
   // Begin Seral for debugging
-  Serial.begin(250000);
+  Serial.begin(9600);
   delay(100);
   // *JC - setup button pins for digitalRead
   for(int i=0; i<3; i++){
@@ -340,15 +384,15 @@ void setup() {
   } else {
     analogReference(INTERNAL);
   }
-
+  delay(1000);
   // Read idle/centre positions for Sensors.
   // *JC - First read gives unpredictable values so do it twice
   readAllFromSensors(centerPoints);
-  delay(1000);
   readAllFromSensors(centerPoints);
-  readAllFromSensors(centerPoints);
+ 
 }
 
+//-------------------------------------------------------------------------
 uint8_t keyChange = 0; // C004 - *JC - variable to determine if new key report needs to be sent.
 // Function to send translation and rotation data to the 3DConnexion software using the HID protocol outlined earlier. Two sets of data are sent: translation and then rotation.
 // For each, a 16bit integer is split into two using bit shifting. The first is mangitude and the second is direction.
@@ -368,21 +412,34 @@ void send_command(int16_t rx, int16_t ry, int16_t rz, int16_t x, int16_t y, int1
   //  bit 5 - front view File
   //  bit 6 - no function?
   //  bit 7 - no function?
+
+
+
   uint8_t btn[4] ={32*buttonValues[3]+16*buttonValues[2]+4*buttonValues[1]+buttonValues[0]+2*buttonValues[5],0,0,4*buttonValues[4]}; // C007 added 2nd Pseudo button as Fit to Screen
-  if (cycleButton) { // C009 use pseudo buttons to select views - button 2 controls which view is selected.
+
+  #ifdef include_cycleViews // C009 use pseudo buttons to select views - button 2 controls which view is selected.
     btn[0] = 32*buttonValues[6]+16*buttonValues[7]+4*buttonValues[8]+buttonValues[0]+2*buttonValues[1];
     btn[1] = buttonValues[4]+16*buttonValues[5];
     btn[3] = 4*buttonValues[3];
-  }
-    if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]+64*buttonValues[6]+128*buttonValues[7]+256*buttonValues[8]!=keyChange) { // C004 - *JC - changed operation *JC - only send report if a button is pressed C007 added new pseudo buttons to check
+  #endif
+    if (buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]+64*buttonValues[6]+128*buttonValues[7]+256*buttonValues[8]!=keyChange) {  // // C004 - *JC - changed operation *JC - only send report if a button is pressed C007 added new pseudo buttons to check
     if (debug == 6) {Serial.print("btn[0] = ");Serial.print(btn[0]);Serial.print(" btn[1] = ");Serial.print(btn[1]);Serial.print(" btn[2] = ");Serial.print(btn[2]);Serial.print(" btn[3] = ");Serial.println(btn[3]); }
-    HID().SendReport(3,btn,4);
     keyChange = buttonValues[0]+2*buttonValues[1]+4*buttonValues[2]+8*buttonValues[3]+16*buttonValues[4]+32*buttonValues[5]+64*buttonValues[6]+128*buttonValues[7]+256*buttonValues[8]; // C004 - *JC - record keys pressed for next time through the loop C007 added new pseudo buttons to keychange value
     if (debug == 6) {Serial.print("keyChange = "); Serial.println(keyChange);} // C005 - *JC - to help debug key press issues
+  //C014
 
-  }
+  #ifdef include_SensitivityAdjustment
+    if (!buttonValues[5]) {
+  #endif
+    HID().SendReport(3,btn,4);
+  #ifdef include_SensitivityAdjustment
+    }
+  #endif
+  // end C014
+  }  // end key changed
 }
 
+//-------------------------------------------------------------------------
 void loop() {
   int rawReads[8], centered[8];
   uint8_t buttonReads[9]; // C007 - *JC added two more values for two extra pseudo buttons C009 added another 3 pseudo switches to cycle views when button 2 (front) pressed
@@ -420,6 +477,51 @@ void loop() {
     Serial.print("HES8:"); Serial.print(centered[6]); Serial.print(",");
     Serial.print("HES9:"); Serial.println(centered[7]);
   }
+
+  // C013 -- cneck if mouse in home position but not centered
+  #ifdef include_AutoRecenter
+  if( greaterThanThreshold) { // always false the first time through. this indicates a possible change in the center position or user movement
+    withinBounds=true;
+    for(int i=0;i<8;i++) { // check if any sensor reading is outside the permitted threshold for adjusting the center i.e. this is user movement
+      if(abs(centered[i] -oldCentered[i])>variationThreshold) {
+        withinBounds = false;
+        if (debug==7) {Serial.print("Sensor ");Serial.print(i);Serial.print(" Centered = ");Serial.print(centered[i]);Serial.print(" oldCentered = ");Serial.print(oldCentered[i]);Serial.print(" Variation = ");Serial.println(abs(centered[i] -oldCentered[i]));}
+      }
+    }
+    if (withinBounds) {
+      // possible new center position. check if the values have been stable for sufficient time
+      //Serial.println("withinBounds");
+      if ((millis() - startTime)>stableTime)
+        {
+          readAllFromSensors(centerPoints);
+          if (debug == 7) Serial.println("reset centerPoints");
+          greaterThanThreshold = false;
+          firstTime = true;
+        }
+    } else {
+      //no change or user movement
+      if (debug == 7) Serial.println("no change");
+      greaterThanThreshold = false;
+      firstTime = true;
+    }
+   }
+
+// check if we have moved from the last center position (user movement or center drift)
+   for(int i=0;i<8;i++){
+    if((!greaterThanThreshold) && (abs(centered[i])>variationThreshold))  greaterThanThreshold = true; // if any user movement is detected then it is not drift
+    }
+
+// if there is movement detected and this is the first time it has been detected then remember this position and start timer.
+  if ((greaterThanThreshold) && (firstTime)) {
+    for(int i=0;i<8;i++){
+      oldCentered[i]=centered[i];  // if oldCentered Changes we need to readjust it
+    }
+    firstTime = false;
+    startTime = millis();
+  }
+#endif // include_AutoRecenter
+  // end of C013
+
   // Filter movement values. Set to zero if movement is below deadzone threshold.
   // *JC - Changed operation so there isn't a sudden jump when the value first falls outside deadzone
   for(int i=0; i<8; i++){
@@ -449,18 +551,11 @@ void loop() {
   // Doing all through arithmetic contribution by fdmakara
   // Integer has been changed to 16 bit int16_t to match what the HID protocol expects.
   int16_t transX, transY, transZ, rotX, rotY, rotZ; // Declare movement variables at 16 bit integers
-  // Original fdmakara calculations
-  //transX = (-centered[AX] +centered[CX])/1;
-  //transY = (-centered[BX] +centered[DX])/1;
-  //transZ = (-centered[AY] -centered[BY] -centered[CY] -centered[DY])/2;
-  //rotX = (-centered[AY] +centered[CY])/2;
-  //rotY = (+centered[BY] -centered[DY])/2;
-  //rotZ = (+centered[AX] +centered[BX] +centered[CX] +centered[DX])/4;
   
   // *JC - Replaced Joystick calculations with ones for the Hall Effect Sensors
   // C011 replaced the divide by 2 on shorter equasions and divide by 4 on longer ones with a configurable weight calculation
   // C012 All movement calvulations now include all sensors even if their impact on the values returned will be small
-  #ifdef include_C012
+  #ifdef include_UseAllSensorsForAllMovement
     transX = (centered[HES1]-centered[HES0]+centered[HES6]-centered[HES7]+centered[HES2]+centered[HES3]+centered[HES9]+centered[HES8])*transXWeight/weightDivisor;  //C012
     transY = (centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8]+centered[HES1]+centered[HES0]+centered[HES6]+centered[HES7])*transYWeight/weightDivisor;  //C012
   #else
@@ -468,7 +563,7 @@ void loop() {
     transY = (centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8])*transYWeight/weightDivisor;  //pre C012
   #endif 
   transZ = (centered[HES0]+centered[HES1]+centered[HES2]+centered[HES3]+centered[HES6]+centered[HES7]+centered[HES8]+centered[HES9])*transZWeight/weightDivisor;
-  #ifdef include_C012
+  #ifdef include_UseAllSensorsForAllMovement
     rotX = (centered[HES0]+centered[HES1]-centered[HES6]-centered[HES7]+centered[HES2]-centered[HES3]+centered[HES9]-centered[HES8])*rotXWeight/weightDivisor;  // C012
     rotY = (centered[HES8]+centered[HES9]-centered[HES2]-centered[HES3]-centered[HES1]+centered[HES0]-centered[HES6]+centered[HES7])*rotYWeight/weightDivisor;  // C012
   #else
@@ -477,7 +572,7 @@ void loop() {
   #endif
   rotZ = (centered[HES0]+centered[HES2]+centered[HES6]+centered[HES8]-centered[HES1]-centered[HES3]-centered[HES7]-centered[HES9])*rotZWeight/weightDivisor; // C001 *JC - changed default direction of rotation
 
-  #ifdef include_C010 
+  #ifdef include_IgnoreSmallChanges 
   // This section by Jonas Edvinsson
   // C010... (After existing code where transX, transY, transZ, rotX, rotY, rotZ are calculated) ...
 
@@ -506,7 +601,7 @@ void loop() {
   if (abs(rotZ) < dynamicThreshold) rotZ = 0;
 
   // end C010... (Before existing code for "Invert directions" and "send_command"
-  #endif // end of C010 change
+  #endif // include_IgnoreSmallChanges - end of C010 change
 
 // *JC - modified speed calculation to allow for the fact that this is integer calculations
 // so do multiplications prior to divisions to maintain maximum accuracy.
